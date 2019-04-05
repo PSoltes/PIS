@@ -29,6 +29,7 @@ export default class LoginScreen extends React.Component {
   };
 
   render() {
+    const {navigate} = this.props.navigation;
     return (
       <StyleProvider style={getTheme(material)}>
         <Container style={{ backgroundColor: "transparent" }}>
@@ -43,10 +44,11 @@ export default class LoginScreen extends React.Component {
           >
             <View style={{ width: "100%", marginVertical:"5%", alignItems: "center" }}>
               <H2>Knižnica</H2>
-              <H3 style={{color:"#909090"}}>Login</H3>
+              <H3 style={{color:"#909090"}}>Prihlásenie</H3>
             </View>
             <View style={{ width: "100%", alignItems: "center" }}>
               <Item
+                floatingLabel
                 underline
                 style={{
                   width: "90%"
@@ -54,9 +56,9 @@ export default class LoginScreen extends React.Component {
                 stackedLabel
               >
                 <Label>Email</Label>
-                <Input placeholder="Email" />
               </Item>
               <Item
+                floatingLabel
                 underline
                 style={{
                   width: "90%"
@@ -64,12 +66,11 @@ export default class LoginScreen extends React.Component {
                 stackedLabel
               >
                 <Label>Heslo</Label>
-                <Input placeholder="Heslo" />
               </Item>
             </View>
             <Item>
-              <Button block width="70%">
-                <Text> Login </Text>
+              <Button block width="70%" onPress={() => navigate('Home', {name: 'Richard'})}>
+                <Text> Prihlásiť </Text>
               </Button>
             </Item>
           </Content>
