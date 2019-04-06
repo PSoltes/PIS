@@ -14,32 +14,8 @@ import {
   H3,
   StyleProvider
 } from "native-base";
-import SoapRequest from 'react-native-soap-request';
+import getByAttribute from "../scripts/GetByAttribute.js";
 
-const soapRequest = new SoapRequest({
-  requestURL: 'http://labss2.fiit.stuba.sk/pis/ws/Students/Team035user'
-});
-
-const xmlRequest = soapRequest.createRequest({
-  'typ:ProductRegistrationRequest': {
-    attributes: {
-      'xmlns:typ': 'http://labss2.fiit.stuba.sk/pis/students/team035user/types'
-    },
-  'team_id': '035',
-  'team_password':'zvbTTu',
-    'user':{
-      'id':1,
-      'name':'Pavol',
-      'surname':'Smajda',
-      'email':'Borecky@gmail.com',
-      'password':'LOLOLO',
-      'login_counter':0,
-      'is_blocked':false,
-      'api_token':null,
-      'picture_path':null
-    }
-  }
-});
 export default class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -49,17 +25,24 @@ export default class LoginScreen extends React.Component {
     };
   }
 
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.value });
-  };
-
- async componentWillMount(){
-    const response = await soapRequest.sendRequest();
-    console.warn(response)
+  async login(email, password) {
+    getByAttribute('email', email, 'user').then(
+      function(user) {
+        console.log(user);
+        if (user && user.password == password) {
+          console.log("login muthafuckarr");
+        } else {
+          console.log("nespravne heslo");
+        }
+      },
+      function(err) {
+        console.log(err);
+      }
+    );
   }
 
   render() {
-    const {navigate} = this.props.navigation;
+    const { navigate } = this.props.navigation;
     return (
       <StyleProvider style={getTheme(material)}>
         <Container style={{ backgroundColor: "transparent" }}>
@@ -72,9 +55,15 @@ export default class LoginScreen extends React.Component {
               alignItems: "center"
             }}
           >
-            <View style={{ width: "100%", marginVertical:"5%", alignItems: "center" }}>
+            <View
+              style={{
+                width: "100%",
+                marginVertical: "5%",
+                alignItems: "center"
+              }}
+            >
               <H2>Knižnica</H2>
-              <H3 style={{color:"#909090"}}>Prihlásenie</H3>
+              <H3 style={{ color: "#909090" }}>Prihlásenie</H3>
             </View>
             <View style={{ width: "100%", alignItems: "center" }}>
               <Item
@@ -85,7 +74,11 @@ export default class LoginScreen extends React.Component {
                 }}
               >
                 <Label>Email</Label>
-                <Input name="email" onPress={this.handleChange("email")} value={this.state.email}></Input>
+                <Input
+                  name="email"
+                  onChangeText={text => this.setState({ email: text })}
+                  value={this.state.email}
+                />
               </Item>
               <Item
                 floatingLabel
@@ -95,11 +88,22 @@ export default class LoginScreen extends React.Component {
                 }}
               >
                 <Label>Heslo</Label>
-                <Input secureTextEntry name="password" onPress={this.handleChange("password")} value={this.state.email}></Input>
+                <Input
+                  secureTextEntry
+                  name="password"
+                  onChangeText={text => this.setState({ password: text })}
+                  value={this.state.password}
+                />
               </Item>
             </View>
             <Item>
-              <Button block width="70%" onPress={() => navigate('Home', {name: 'Richard'})}>
+              <Button
+                block
+                width="70%"
+                onPress={() => {
+                  this.login(this.state.email, this.state.password);
+                }}
+              >
                 <Text> Prihlásiť </Text>
               </Button>
             </Item>

@@ -13,7 +13,8 @@
     "react-dom": "^16.8.6",
     "react-native": "0.59.3",
     "react-native-gesture-handler": "^1.1.0",
-    "react-native-soap-request": "0.0.2"
+    "react-native-soap-request": "0.0.2",
+    "react-native-xml2js": "^1.0.3"
   },
   "devDependencies": {
     "@babel/core": "7.4.0",
