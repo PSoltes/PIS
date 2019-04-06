@@ -15,6 +15,7 @@ import {
   StyleProvider
 } from "native-base";
 import getByAttribute from "../scripts/GetByAttribute.js";
+import getById from '../scripts/GetById.js';
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -26,18 +27,20 @@ export default class LoginScreen extends React.Component {
   }
 
   async login(email, password) {
+    let usr='';
     getByAttribute('email', email, 'user').then(
-      function(user) {
-        console.log(user);
-        if (user && user.password == password) {
-          console.log("login muthafuckarr");
-        } else {
-          console.log("nespravne heslo");
-        }
-      },
-      function(err) {
-        console.log(err);
+    function(user) {
+      console.log(user);
+      usr=user;
+      if (user && user.password == password) {
+        console.log("login muthafuckarr");
+      } else {
+        console.log("nespravne heslo");
       }
+    },
+    function(err) {
+      console.log(err);
+    }
     );
   }
 
