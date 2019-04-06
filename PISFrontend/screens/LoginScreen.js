@@ -14,7 +14,32 @@ import {
   H3,
   StyleProvider
 } from "native-base";
+import SoapRequest from 'react-native-soap-request';
 
+const soapRequest = new SoapRequest({
+  requestURL: 'http://labss2.fiit.stuba.sk/pis/ws/Students/Team035user'
+});
+
+const xmlRequest = soapRequest.createRequest({
+  'typ:ProductRegistrationRequest': {
+    attributes: {
+      'xmlns:typ': 'http://labss2.fiit.stuba.sk/pis/students/team035user/types'
+    },
+  'team_id': '035',
+  'team_password':'zvbTTu',
+    'user':{
+      'id':1,
+      'name':'Pavol',
+      'surname':'Smajda',
+      'email':'Borecky@gmail.com',
+      'password':'LOLOLO',
+      'login_counter':0,
+      'is_blocked':false,
+      'api_token':null,
+      'picture_path':null
+    }
+  }
+});
 export default class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -27,6 +52,11 @@ export default class LoginScreen extends React.Component {
   handleChange = name => event => {
     this.setState({ [name]: event.target.value });
   };
+
+ async componentWillMount(){
+    const response = await soapRequest.sendRequest();
+    console.warn(response)
+  }
 
   render() {
     const {navigate} = this.props.navigation;
