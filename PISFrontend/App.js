@@ -2,11 +2,11 @@ import React from "react";
 import { createStackNavigator, createAppContainer } from "react-navigation";
 import LoginScreen from './screens/LoginScreen.js';
 import HomeScreen from './screens/HomeScreen.js';
-import MyBooksScreen from './screens/MyBooksScreen';
-import BookDetail from './screens/BookDetail';
-import AdminConfirmationScreen from './screens/AdminConfirmationScreen';
-import AdminListScreen from './screens/AdminListScreen';
-import AddRevieweScreen from './screens/AddReviewScreen';
+import MyBooksScreen from './screens/MyBooksScreen.js';
+import BookDetail from './screens/BookDetail.js';
+import AdminConfirmationScreen from './screens/AdminConfirmationScreen.js';
+import AdminListScreen from './screens/AdminListScreen.js';
+import AddRevieweScreen from './screens/AddReviewScreen.js';
 
 
 
