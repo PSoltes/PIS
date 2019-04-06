@@ -53,9 +53,9 @@ export default class LoginScreen extends React.Component {
                 style={{
                   width: "90%"
                 }}
-                stackedLabel
               >
                 <Label>Email</Label>
+                <Input name="email" onPress={this.handleChange("email")} value={this.state.email}></Input>
               </Item>
               <Item
                 floatingLabel
@@ -63,9 +63,9 @@ export default class LoginScreen extends React.Component {
                 style={{
                   width: "90%"
                 }}
-                stackedLabel
               >
                 <Label>Heslo</Label>
+                <Input secureTextEntry name="password" onPress={this.handleChange("password")} value={this.state.email}></Input>
               </Item>
             </View>
             <Item>
