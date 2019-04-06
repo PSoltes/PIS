@@ -1,7 +1,12 @@
 import React from "react";
 import { createStackNavigator, createAppContainer } from "react-navigation";
-import LoginScreen from './screens/LoginScreen.js'
-import HomeScreen from './screens/HomeScreen.js'
+import LoginScreen from './screens/LoginScreen.js';
+import HomeScreen from './screens/HomeScreen.js';
+import MyBooksScreen from './screens/MyBooksScreen';
+import BookDetail from './screens/BookDetail';
+import AdminConfirmationScreen from './screens/AdminConfirmationScreen';
+import AdminListScreen from './screens/AdminListScreen';
+import AddRevieweScreen from './screens/AddReviewScreen';
 
 
 
@@ -16,11 +21,26 @@ const AppNavigator = createStackNavigator(
         header: null
     }
     },
+    MyBooks:{
+        screen:  MyBooksScreen,
+    },
+    BookDetail:{
+      screen:  BookDetail,
+    },
+    AdminConfirmationScreen:{
+      screen: AdminConfirmationScreen,
+    },
+    AdminListScreen:{
+      screen: AdminListScreen,
+    },
+    AddRevieweScreen :{
+      screen: AddRevieweScreen ,
+    },
     Home:{
-        screen: HomeScreen,
-        navigationOptions:{
-            header: null
-        }
+      screen: HomeScreen,
+      navigationOptions:{
+        header: null
+      }
     },
   },
   {
