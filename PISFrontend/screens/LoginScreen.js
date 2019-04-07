@@ -13,7 +13,7 @@ import {
   Button,
   H3,
   StyleProvider,
-  Toast
+  Toast,
 } from "native-base";
 import getByAttribute from "../scripts/GetByAttribute.js";
 import update from "../scripts/Update.js";
@@ -36,7 +36,7 @@ export default class LoginScreen extends React.Component {
     getByAttribute("email", email, "user").then(
       async function(user) {
         user = dearray(user);
-        if (user.is_blocked) {
+        if (user.is_blocked == "true") {
           Toast.show({
             text:
               "Účet používateľa je zablokovaný. Na mail bola zaslaná správa pre odblokovanie",
@@ -45,6 +45,7 @@ export default class LoginScreen extends React.Component {
           });
         } else if (user && user.password == password) {
           user.api_token = uuidv4();
+          user.login_counter = 0;
           current_user = {
             api_token: user.api_token,
             id: user.id
