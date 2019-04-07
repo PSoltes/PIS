@@ -33,7 +33,7 @@ export default class AdminListScreen extends Component {
       <View>
         <Card style={{width:'90%',alignSelf: 'center'}}>
           <CardItem button onPress={()=>{
-            this.props.navigation.navigate('AdminConfirmationScreen');
+            this.props.navigation.navigate('AdminConfirmationScreen',{items:item});
             console.warn(item.key)}}>
             <Body>
             <View style={{flex:1,flexDirection:'row',alignSelf: 'stretch'}}>
@@ -62,8 +62,7 @@ export default class AdminListScreen extends Component {
         </Card>
       </View>
       )}
-      />
-      </Content>
+      /></Content>
     </Container>
     );
   }
