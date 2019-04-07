@@ -1,6 +1,6 @@
 import SoapRequest from "react-native-soap-request";
 
-export default async function Update(object, id, entity)
+export default async function update(object, id, entity)
 {
   return new Promise( async function(resolve, reject){
 
@@ -17,7 +17,7 @@ export default async function Update(object, id, entity)
         'team_id': '035',
         'team_password':'zvbTTu',
         'entity_id': id,
-         entity : object
+         [entity] : object
       }
     });
 

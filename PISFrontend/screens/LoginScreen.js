@@ -12,35 +12,66 @@ import {
   H2,
   Button,
   H3,
-  StyleProvider
+  StyleProvider,
+  Toast
 } from "native-base";
 import getByAttribute from "../scripts/GetByAttribute.js";
-import getById from '../scripts/GetById.js';
+import update from "../scripts/Update.js";
+
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       email: "",
-      password: ""
+      password: "",
+      showToast: false
     };
   }
 
   async login(email, password) {
-    let usr='';
-    getByAttribute('email', email, 'user').then(
-    function(user) {
-      console.warn(user);
-      /*usr=user;
-      if (user && user.password == password) {
-        console.log("login muthafuckarr");
-      } else {
-        console.log("nespravne heslo");
-      }*/
-    },
-    function(err) {
-      console.log(err);
-    }
+    let usr = "";
+    getByAttribute("email", email, "user").then(
+      async function(user) {
+        if (user && user.password == password) {
+          console.log("login muthafuckarr");
+        } else {
+          if(user)
+          {
+            user.login_counter = parseInt(user.login_counter) + 1;
+            if(user.login_counter >= 3)
+            {
+              user.is_blocked = true;
+            }
+            const ordered_user = 
+            {
+              'id': user.id[0],
+              'name': user.name[0],
+              'surname': user.surname[0],
+              'email': user.email[0],
+              'password': user.password[0],
+              'login_counter': user.login_counter,
+              'is_blocked': user.is_blocked[0],
+              'api_token': user.api_token[0],
+              'picture_path': user.picture_path[0]
+
+            }
+            console.log(ordered_user);
+            const log = await update(ordered_user, ordered_user.id, 'user');
+            console.log(log);
+
+          }
+          Toast.show({
+            text: "Nesprávne meno alebo heslo!",
+            buttonText: "OK",
+            duration: 3000,
+            type: "danger"
+          });
+        }
+      },
+      function(err) {
+        console.log(err);
+      }
     );
   }
 
