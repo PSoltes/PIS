@@ -17,9 +17,11 @@ export default async function Update(object, id, entity)
         'team_id': '035',
         'team_password':'zvbTTu',
         'entity_id': id,
-        'entity' : object
+         entity : object
       }
     });
+
+    console.log(soapRequest);
     const response = await soapRequest.sendRequest();
 
     resolve(response);

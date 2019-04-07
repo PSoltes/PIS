@@ -16,7 +16,7 @@ export default async function Insert(object, entity)
         },
         'team_id': '035',
         'team_password':'zvbTTu',
-        'entity' : object
+         entity : object
       }
     });
     const response = await soapRequest.sendRequest();
