@@ -17,7 +17,9 @@ import {
 } from "native-base";
 import getByAttribute from "../scripts/GetByAttribute.js";
 import update from "../scripts/Update.js";
-
+import dearray from "../scripts/Dearray.js";
+import { AsyncStorage } from "react-native";
+const uuidv4 = require("uuid/v4");
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -30,36 +32,42 @@ export default class LoginScreen extends React.Component {
   }
 
   async login(email, password) {
-    let usr = "";
+    const that = this;
     getByAttribute("email", email, "user").then(
       async function(user) {
-        if (user && user.password == password) {
-          console.log("login muthafuckarr");
+        user = dearray(user);
+        if (user.is_blocked) {
+          Toast.show({
+            text:
+              "Účet používateľa je zablokovaný. Na mail bola zaslaná správa pre odblokovanie",
+            buttonText: "OK",
+            type: "danger"
+          });
+        } else if (user && user.password == password) {
+          user.api_token = uuidv4();
+          current_user = {
+            api_token: user.api_token,
+            id: user.id
+          };
+
+          returnVal = async () => {
+            try {
+              await AsyncStorage.setItem("current_user", current_user);
+            } catch {
+              console.log("posral sa async store");
+            }
+          };
+          await update(user, user.id, "user");
+
+          that.props.navigation.navigate("Home");
         } else {
-          if(user)
-          {
+          if (user) {
             user.login_counter = parseInt(user.login_counter) + 1;
-            if(user.login_counter >= 3)
-            {
+            if (user.login_counter >= 3) {
               user.is_blocked = true;
+              //dorobit mail pre odblokovanie
             }
-            const ordered_user = 
-            {
-              'id': user.id[0],
-              'name': user.name[0],
-              'surname': user.surname[0],
-              'email': user.email[0],
-              'password': user.password[0],
-              'login_counter': user.login_counter,
-              'is_blocked': user.is_blocked[0],
-              'api_token': user.api_token[0],
-              'picture_path': user.picture_path[0]
-
-            }
-            console.log(ordered_user);
-            const log = await update(ordered_user, ordered_user.id, 'user');
-            console.log(log);
-
+            const log = await update(user, user.id, "user");
           }
           Toast.show({
             text: "Nesprávne meno alebo heslo!",
@@ -76,7 +84,6 @@ export default class LoginScreen extends React.Component {
   }
 
   render() {
-    const { navigate } = this.props.navigation;
     return (
       <StyleProvider style={getTheme(material)}>
         <Container style={{ backgroundColor: "transparent" }}>
@@ -134,9 +141,11 @@ export default class LoginScreen extends React.Component {
               <Button
                 block
                 width="70%"
-                onPress={() => {
-                  this.login(this.state.email, this.state.password);
-                }}
+                onPress={this.login.bind(
+                  this,
+                  this.state.email,
+                  this.state.password
+                )}
               >
                 <Text> Prihlásiť </Text>
               </Button>
