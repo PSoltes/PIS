@@ -26,7 +26,7 @@ export default class LoginScreen extends React.Component {
   }
 
   async login(email, password) {
-    getByAttribute('email', email, 'user').then(
+      getByAttribute('email', email, 'user').then(
       function(user) {
         console.log(user);
         if (user && user.password == password) {
