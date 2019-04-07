@@ -25,23 +25,30 @@ export default class LoginScreen extends React.Component {
       password: ""
     };
   }
-
+  componentWillMount() {
+    this.props.navigation.navigate('AdminListScreen');
+  }
   async login(email, password) {
-    let usr='';
-    getByAttribute('email', email, 'user').then(
+    let usr=null;
+    await getByAttribute('email', email, 'user').then(
     function(user) {
-      console.warn(user);
-      /*usr=user;
-      if (user && user.password == password) {
-        console.log("login muthafuckarr");
+      console.warn(user.password[0]);
+      if (user && user.password[0] == password) {
+        console.warn("login muthafuckarr");
+        usr = user;
+        console.warn(usr);
       } else {
-        console.log("nespravne heslo");
-      }*/
+        console.warn("nespravne heslo");
+      }
     },
     function(err) {
       console.log(err);
     }
     );
+    console.warn(usr);
+    if (usr != null){
+      this.props.navigation.navigate('AdminListScreen');
+    }
   }
 
   render() {

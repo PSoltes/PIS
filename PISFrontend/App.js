@@ -23,18 +23,38 @@ const AppNavigator = createStackNavigator(
     },
     MyBooks:{
         screen:  MyBooksScreen,
+      navigationOptions:
+      {
+        header: null
+      }
     },
     BookDetail:{
       screen:  BookDetail,
+      navigationOptions:
+      {
+        header: null
+      }
     },
     AdminConfirmationScreen:{
       screen: AdminConfirmationScreen,
+      navigationOptions:
+      {
+        header: null
+      }
     },
     AdminListScreen:{
       screen: AdminListScreen,
+      navigationOptions:
+      {
+        header: null
+      }
     },
     AddRevieweScreen :{
       screen: AddRevieweScreen ,
+      navigationOptions:
+      {
+        header: null
+      }
     },
     Home:{
       screen: HomeScreen,
