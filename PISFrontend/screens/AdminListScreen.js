@@ -33,29 +33,28 @@ export default class AdminListScreen extends Component {
       console.log(cf[c].user_id[0]+" - "+cf[c].book_id[0]);
       let bkid=cf[c].book_id[0];let usrid=cf[c].user_id[0];
       await getById(usrid,'user').then(
-      function(conf) {
-        console.warn(conf);
-        usr=conf;
-      },
-      function(err) {
-        console.log(err);
-      }
-      );
-      await getById(bkid,'book').then(
-      function(conf) {
-        console.warn(conf);
-        book=conf;
+      function(us) {;
+        usr=us;
       },
       function(err) {
         console.log(err);
       }
       );
       console.log(usr);
-      console.log(book);
+      await getById(bkid,'book').then(
+      function(conf) {
+        book=conf;
+      },
+      function(err) {
+        console.log(err);
+      }
+      );
+      let obj = {key:cf[c].id[0],book:book,conf:cf[c],type:'Komentár',user:usr};
+      arr.push(obj);
     }
+    this.setState({confirms:arr});
+    console.log(this.state.confirms);
   }
-  }
-  async LoadData(){
 
   }
   render() {
@@ -75,43 +74,40 @@ export default class AdminListScreen extends Component {
       </Header>
       <Content>
       <FlatList
-      data={[{key: '1',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' },
+      data={this.state.confirms}
+        /*[{key: '1',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' },
         {key: '2',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' },
         {key: '3',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' },
         {key: '4',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' },
-        {key: '5',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' }]}
+        {key: '5',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' }]}*/
       renderItem={({item})=>(
-      <View>
         <Card style={{width:'90%',alignSelf: 'center'}}>
-          <CardItem button onPress={()=>{
+          <CardItem width="100%" button onPress={()=>{
             this.props.navigation.navigate('AdminConfirmationScreen',{items:item});
-            console.warn(item.key)}}>
-            <Body>
-            <View style={{flex:1,flexDirection:'row',alignSelf: 'stretch'}}>
-              <View style={{alignItems:'flex-start'}}>
+           }}>
+            <Body width="100%">
+            <View width="100%">
                 <View>
-                  <H3 style={{color:'#00e6b8'}}>{item.book}</H3>
+                  <H3 style={{color:'#00e6b8'}}>{item.book.name[0]}</H3>
                 </View>
-                <View>
+                <View  width="100%" style={{font:15,flex:1,flexDirection:'row',alignSelf: 'stretch'}}>
+                  <View>
                   <Text>
-                    {item.author}
+                    {item.book.author[0]}
                   </Text>
+                    <Text>
+                      {item.user.name[0]} {item.user.surname[0]}
+                    </Text>
+                  </View>
+                  <Right>
+                        <Text>{item.type} </Text>
+                        <Text>{item.conf.created_at[0]}</Text>
+                  </Right>
                 </View>
-              </View>
-              <View style={{alignItems:'flex-end',font:15}}>
-                <View>
-                  <Text>{item.date}</Text>
-                </View>
-                <View>
-                  <Text>{item.type} , {item.user}</Text>
-                </View>
-              </View>
             </View>
-
             </Body>
           </CardItem>
         </Card>
-      </View>
       )}
       /></Content>
     </Container>

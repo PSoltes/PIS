@@ -10,6 +10,14 @@ export default class AdminConfirmationScreen extends Component {
   render() {
     const { navigation } = this.props;
      item = navigation.getParam('items', {});
+     let expresion='';
+     if(item.conf.has_wrong_expression[0]){
+      expresion='NEPREŠIEL'
+     }
+     else {
+       expresion='PREŠIEL'
+     }
+
     return (
     <Container>
       <Header style={{ backgroundColor: '#00e6b8'}} androidStatusBarColor="#00e6b8">
@@ -25,30 +33,30 @@ export default class AdminConfirmationScreen extends Component {
       <Content width="90%" style={{flex:1,alignSelf:'center'}}>
         <View style={{flex:1,borderBottomWidth:3,borderColor:'#00e6b8',alignItems:'flex-start',margin:10}}>
           <View>
-            <H1 style={{color:'#00e6b8',marginBottom:10}}>{item.book}</H1>
+            <H1 style={{color:'#00e6b8',marginBottom:10}}>{item.book.name[0]}</H1>
           </View>
           <View>
             <H3 style={{marginBottom:10}}>
-              {item.author}
+              {item.book.author[0]}
             </H3>
           </View>
         </View>
         <View style={{alignItems:'flex-start',margin:10}}>
           <View >
-            <Text style={stylos.bold}>Autor:<Text style={stylos.normal}>{item.user}</Text> </Text>
+            <Text style={stylos.bold}>Autor:<Text style={stylos.normal}>{item.user.name[0]} {item.user.surname[0]}</Text> </Text>
           </View>
           <View>
-            <Text style={stylos.bold}>Datum pridania: <Text style={stylos.normal}>{item.date}</Text></Text>
+            <Text style={stylos.bold}>Datum pridania: <Text style={stylos.normal}>{item.conf.created_at[0]}</Text></Text>
           </View>
           <View>
-            <Text style={stylos.bold}>Kontrola zkázaných výrazov: <Text style={{color:'green'}}>PREŠIEL</Text></Text>
+            <Text style={stylos.bold}>Kontrola zakázaných výrazov: <Text style={{color:'green'}}>{expresion}</Text></Text>
           </View>
         </View>
         <View>
           <Card style={{backGroundColor:'grey',font:10,flex:1,margin:10}}>
             <Text style={{padding:5}}>
-              It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-            </Text>
+              {item.conf.text[0]}
+              </Text>
           </Card>
         </View>
         <View width="92%" style={{flexDirection:'row',flex:1,alignSelf: 'stretch',margin:10}}>

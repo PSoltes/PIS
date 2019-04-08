@@ -29,7 +29,7 @@ export default async function getByAttribute(name, value, entity) {
       const result =
         response["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["0"][
           "ns1:getByAttributeValueResponse"
-        ]["0"][entity + "s"]["0"][entity]["0"];
+        ]["0"][entity + "s"]["0"][entity];
       resolve(result);
     } else {
       resolve(null);
