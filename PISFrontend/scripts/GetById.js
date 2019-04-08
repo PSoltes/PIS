@@ -18,16 +18,17 @@ export default async function getById(id, entity) {
       }
     });
     const response = await soapRequest.sendRequest();
+    console.log(response);
 
     if (
       response["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["0"][
-        "ns1:getByAttributeValueResponse"
-      ]["0"][entity + "s"]["0"].hasOwnProperty(entity)
+        "ns1:getByIdResponse"
+      ]["0"].hasOwnProperty(entity)
     ) {
       const result =
         response["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["0"][
-          "ns1:getByAttributeValueResponse"
-        ]["0"][entity + "s"]["0"][entity]["0"];
+          "ns1:getByIdResponse"
+        ]["0"][entity]["0"];
       resolve(result);
     } else {
       resolve(null);

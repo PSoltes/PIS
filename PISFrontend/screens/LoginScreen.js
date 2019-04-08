@@ -13,12 +13,12 @@ import {
   Button,
   H3,
   StyleProvider,
-  Toast,
+  Toast
 } from "native-base";
 import getByAttribute from "../scripts/GetByAttribute.js";
 import update from "../scripts/Update.js";
 import dearray from "../scripts/Dearray.js";
-import { AsyncStorage } from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
 const uuidv4 = require("uuid/v4");
 
 export default class LoginScreen extends React.Component {
@@ -46,21 +46,17 @@ export default class LoginScreen extends React.Component {
         } else if (user && user.password == password) {
           user.api_token = uuidv4();
           user.login_counter = 0;
-          current_user = {
-            api_token: user.api_token,
-            id: user.id
-          };
+          
 
-          returnVal = async () => {
-            try {
-              await AsyncStorage.setItem("current_user", current_user);
-            } catch {
-              console.log("posral sa async store");
-            }
-          };
+          try {
+            await AsyncStorage.setItem("id", user.id);
+            await AsyncStorage.setItem("api_token", user.api_token);
+          } catch (error) {
+            console.log("posral sa async store " + error);
+          }
           await update(user, user.id, "user");
 
-          that.props.navigation.navigate("Home");
+          that.props.navigation.navigate("Home", {name: user.name});
         } else {
           if (user) {
             user.login_counter = parseInt(user.login_counter) + 1;
