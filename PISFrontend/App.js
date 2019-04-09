@@ -17,20 +17,40 @@ const AppNavigator = createStackNavigator(
         header: null
       }
     },
-    MyBooks: {
-      screen: MyBooksScreen
+    MyBooks:{
+        screen:  MyBooksScreen,
+      navigationOptions:
+      {
+        header: null
+      }
     },
-    BookDetail: {
-      screen: BookDetail
+    BookDetail:{
+      screen:  BookDetail,
+      navigationOptions:
+      {
+        header: null
+      }
     },
-    AdminConfirmationScreen: {
-      screen: AdminConfirmationScreen
+    AdminConfirmationScreen:{
+      screen: AdminConfirmationScreen,
+      navigationOptions:
+      {
+        header: null
+      }
     },
-    AdminListScreen: {
-      screen: AdminListScreen
+    AdminListScreen:{
+      screen: AdminListScreen,
+      navigationOptions:
+      {
+        header: null
+      }
     },
-    AddRevieweScreen: {
-      screen: AddRevieweScreen
+    AddRevieweScreen :{
+      screen: AddRevieweScreen ,
+      navigationOptions:
+      {
+        header: null
+      }
     },
     Home: {
       screen: HomeScreen,

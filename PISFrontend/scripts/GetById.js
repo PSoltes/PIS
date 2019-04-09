@@ -21,14 +21,13 @@ export default async function getById(id, entity) {
     console.log(response);
 
     if (
-      response["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["0"][
-        "ns1:getByIdResponse"
-      ]["0"].hasOwnProperty(entity)
+    response["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["0"][
+    "ns1:getByIdResponse"]["0"].hasOwnProperty(entity)
     ) {
       const result =
-        response["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["0"][
-          "ns1:getByIdResponse"
-        ]["0"][entity]["0"];
+      response["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["0"][
+      "ns1:getByIdResponse"]["0"][entity]["0"];
+
       resolve(result);
     } else {
       resolve(null);
