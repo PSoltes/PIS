@@ -36,7 +36,7 @@ export default class LoginScreen extends React.Component {
     getByAttribute("email", email, "user").then(
       async function(user) {
         user = dearray(user);
-        if (user.is_blocked == "true") {
+        if (user && user.is_blocked == "true") {
           Toast.show({
             text:
               "Účet používateľa je zablokovaný. Na mail bola zaslaná správa pre odblokovanie",
@@ -49,8 +49,8 @@ export default class LoginScreen extends React.Component {
           
 
           try {
-            await AsyncStorage.setItem("id", user.id);
-            await AsyncStorage.setItem("api_token", user.api_token);
+            AsyncStorage.setItem("id", user.id);
+            AsyncStorage.setItem("api_token", user.api_token);
           } catch (error) {
             console.log("posral sa async store " + error);
           }
@@ -64,7 +64,7 @@ export default class LoginScreen extends React.Component {
               user.is_blocked = true;
               //dorobit mail pre odblokovanie
             }
-            const log = await update(user, user.id, "user");
+            update(user, user.id, "user");
           }
           Toast.show({
             text: "Nesprávne meno alebo heslo!",
