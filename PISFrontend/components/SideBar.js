@@ -5,6 +5,29 @@ import getById from "../scripts/GetById.js";
 import dearray from "../scripts/Dearray.js";
 import update from "../scripts/Update.js";
 
+function AdminOrNot(props)
+  {
+    console.log(props.admin);
+      if(props.admin==true)
+      {
+        return (<ListItem
+          button
+          onPress={() => this.props.navigation.navigate("AdminListScreen")}
+        >
+          <Text>Príspevky na potvrdenie</Text>
+          </ListItem>);
+      }
+      else
+      {
+        return ( <ListItem
+          button
+          onPress={() => this.props.navigation.navigate("Home")}
+        >
+          <Text>Moje Knihy</Text>
+        </ListItem>);
+      }
+  }
+
 export default class SideBar extends React.Component {
   async logOff() {
     try {
@@ -37,7 +60,10 @@ export default class SideBar extends React.Component {
       console.log(error);
     }
   }
+
+  
   render() {
+    
     return (
       <Content style={{ backgroundColor: "#FFFFFF" }}>
         <Header
@@ -53,14 +79,12 @@ export default class SideBar extends React.Component {
           <H3>Ahoj</H3>
         </Header>
         <List>
-          <ListItem
-            button
-            onPress={() => this.props.navigation.navigate("Home")}
-          >
-            <Text>Moje Knihy</Text>
-          </ListItem>
+          <AdminOrNot admin={this.props.admin}/>         
           <ListItem button onPress={this.logOff.bind(this)}>
             <Text>Odhlásiť sa!</Text>
+          </ListItem>
+          <ListItem button onPress={() => console.log(this.props.admin)}>
+            <Text>Odhlásiť saa!</Text>
           </ListItem>
         </List>
       </Content>

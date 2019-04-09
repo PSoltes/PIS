@@ -10,6 +10,7 @@ import {
   Card,
   H2,
   Text,
+  CardItem
 } from "native-base";
 import { Image, TouchableOpacity } from "react-native";
 import SideBar from "../components/SideBar.js";
@@ -18,6 +19,7 @@ import AppHeader from "../components/AppHeader.js";
 import getById from "../scripts/GetById.js";
 import getByAttribute from "../scripts/GetByAttribute.js";
 import dearray from "../scripts/Dearray.js";
+import images from "../img/images.js";
 
 export default class HomeScreen extends Component {
   closeDrawer() {
@@ -69,26 +71,35 @@ export default class HomeScreen extends Component {
   render() {
     const bookList = this.state.books.map(book => {
       return (
-        <TouchableOpacity onPress={() => console.log("aaaaaand open")}>
-          <Card style={{ height: "20%", width: "100%" }}>
+        <Card style={{ height: "20%", width: "100%" }}>
+          <CardItem
+            button
+            onPress={() => console.log("aaaaaand open")}
+            style={{
+              height: "100%",
+              paddingLeft: 0,
+              paddingTop: 0,
+              paddingBottom: "3%"
+            }}
+          >
             <Grid>
               <Col
                 style={{ flex: 1, alignItems: "flex-start", height: "100%" }}
                 size={1}
               >
                 <Image
-                  source={require("../img/BookCover.png")}
+                  source={images[book.picture_path]}
                   resizeMode="contain"
                   style={{ width: "100%", flex: 1 }}
                 />
               </Col>
-              <Col size={3} style={{ marginVertical: "3%" }}>
+              <Col size={3} style={{ margin: "3%" }}>
                 <H2 style={{ color: "#0FDDAF" }}>{book.name}</H2>
                 <Text>{book.author}</Text>
               </Col>
             </Grid>
-          </Card>
-        </TouchableOpacity>
+          </CardItem>
+        </Card>
       );
     });
 

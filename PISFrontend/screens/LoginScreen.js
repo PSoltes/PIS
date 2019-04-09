@@ -34,7 +34,7 @@ export default class LoginScreen extends React.Component {
   async login(email, password) {
     const that = this;
     getByAttribute("email", email, "user").then(
-      async function(user) {
+      async (user) => {
         user = dearray(user[0]);
         if (user && user.is_blocked == "true") {
           Toast.show({
@@ -55,8 +55,14 @@ export default class LoginScreen extends React.Component {
             console.log("posral sa async store " + error);
           }
           await update(user, user.id, "user");
-
-          that.props.navigation.navigate("Home", {name: user.name});
+          if(user.is_admin == "true")
+          {
+            this.props.navigation.navigate("AdminListScreen");
+          }
+          else
+          {
+            this.props.navigation.navigate("Home");
+          }
         } else {
           if (user) {
             user.login_counter = parseInt(user.login_counter) + 1;
