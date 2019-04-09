@@ -50,7 +50,7 @@ export default class SideBar extends React.Component {
             paddingVertical:"10%"
           }}
         >
-          <H3>Ahoj {this.props.name}</H3>
+          <H3>Ahoj</H3>
         </Header>
         <List>
           <ListItem

@@ -37,7 +37,7 @@ export default class LoginScreen extends React.Component {
     const that = this;
     getByAttribute("email", email, "user").then(
       async function(user) {
-        user = dearray(user);
+        user = dearray(user[0]);
         if (user && user.is_blocked == "true") {
           Toast.show({
             text:
