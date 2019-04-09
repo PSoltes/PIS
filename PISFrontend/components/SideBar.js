@@ -31,7 +31,7 @@ export default class SideBar extends React.Component {
     try {
       AsyncStorage.removeItem("id");
       AsyncStorage.removeItem("api_token");
-      this.props.closeDrawer();
+      this.props.closeDrawer;
       this.props.navigation.navigate("Login")
     } catch (error) {
       console.log(error);

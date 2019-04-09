@@ -30,9 +30,7 @@ export default class LoginScreen extends React.Component {
       showToast: false
     };
   }
-  componentWillMount() {
-    this.props.navigation.navigate('AdminListScreen');
-  }
+
   async login(email, password) {
     const that = this;
     getByAttribute("email", email, "user").then(
@@ -80,10 +78,6 @@ export default class LoginScreen extends React.Component {
         console.log(err);
       }
     );
-    console.warn(usr);
-    if (usr != null){
-      this.props.navigation.navigate('AdminListScreen');
-    }
   }
 
   render() {
