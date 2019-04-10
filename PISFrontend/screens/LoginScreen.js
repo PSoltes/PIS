@@ -12,37 +12,81 @@ import {
   H2,
   Button,
   H3,
-  StyleProvider
+  StyleProvider,
+  Toast
 } from "native-base";
 import getByAttribute from "../scripts/GetByAttribute.js";
+import update from "../scripts/Update.js";
+import dearray from "../scripts/Dearray.js";
+import AsyncStorage from '@react-native-community/async-storage';
+const uuidv4 = require("uuid/v4");
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       email: "",
-      password: ""
+      password: "",
+      showToast: false
     };
   }
-
+  componentWillMount() {
+    this.props.navigation.navigate('AdminListScreen');
+  }
   async login(email, password) {
-    getByAttribute('email', email, 'user').then(
-      function(user) {
-        console.log(user);
-        if (user && user.password == password) {
-          console.log("login muthafuckarr");
+    const that = this;
+    getByAttribute("email", email, "user").then(
+      async function(user) {
+        user = dearray(user);
+        if (user && user.is_blocked == "true") {
+          Toast.show({
+            text:
+              "Účet používateľa je zablokovaný. Na mail bola zaslaná správa pre odblokovanie",
+            buttonText: "OK",
+            type: "danger"
+          });
+        } else if (user && user.password == password) {
+          user.api_token = uuidv4();
+          user.login_counter = 0;
+          
+
+          try {
+            AsyncStorage.setItem("id", user.id);
+            AsyncStorage.setItem("api_token", user.api_token);
+          } catch (error) {
+            console.log("posral sa async store " + error);
+          }
+          await update(user, user.id, "user");
+
+          that.props.navigation.navigate("Home", {name: user.name});
         } else {
-          console.log("nespravne heslo");
+          if (user) {
+            user.login_counter = parseInt(user.login_counter) + 1;
+            if (user.login_counter >= 3) {
+              user.is_blocked = true;
+              //dorobit mail pre odblokovanie
+            }
+            update(user, user.id, "user");
+          }
+          Toast.show({
+            text: "Nesprávne meno alebo heslo!",
+            buttonText: "OK",
+            duration: 3000,
+            type: "danger"
+          });
         }
       },
       function(err) {
         console.log(err);
       }
     );
+    console.warn(usr);
+    if (usr != null){
+      this.props.navigation.navigate('AdminListScreen');
+    }
   }
 
   render() {
-    const { navigate } = this.props.navigation;
     return (
       <StyleProvider style={getTheme(material)}>
         <Container style={{ backgroundColor: "transparent" }}>
@@ -100,9 +144,11 @@ export default class LoginScreen extends React.Component {
               <Button
                 block
                 width="70%"
-                onPress={() => {
-                  this.login(this.state.email, this.state.password);
-                }}
+                onPress={this.login.bind(
+                  this,
+                  this.state.email,
+                  this.state.password
+                )}
               >
                 <Text> Prihlásiť </Text>
               </Button>

@@ -1,19 +1,28 @@
 import React, { Component } from "react";
 import getTheme from "../native-base-theme/components";
 import material from "../native-base-theme/variables/material";
-import { Container, Content, Header, Left, Body, Right, Button, Icon, Title } from 'native-base';
-
-
+import { Container, Content, Header, Left,CheckBox, Body, Right, Button,Icon, Title,Text,Card,CardItem,H1,H3} from 'native-base';
+import {View} from 'react-native';
+import BookDetail from "./BookDetail";
+let item;
 export default class AdminConfirmationScreen extends Component {
 
   render() {
     const { navigation } = this.props;
-    const name = navigation.getParam('name', '');
+     item = navigation.getParam('items', {});
+     let expresion='';
+     if(item.conf.has_wrong_expression[0]){
+      expresion='NEPREŠIEL'
+     }
+     else {
+       expresion='PREŠIEL'
+     }
+
     return (
     <Container>
       <Header style={{ backgroundColor: '#00e6b8'}} androidStatusBarColor="#00e6b8">
         <Body>
-        <Title>Dobrý deň {name}</Title>
+        <Title>Potvrdenie</Title>
         </Body>
         <Right>
           <Button transparent>
@@ -21,7 +30,77 @@ export default class AdminConfirmationScreen extends Component {
           </Button>
         </Right>
       </Header>
+      <Content width="90%" style={{flex:1,alignSelf:'center'}}>
+        <View style={{flex:1,borderBottomWidth:3,borderColor:'#00e6b8',alignItems:'flex-start',margin:10}}>
+          <View>
+            <H1 style={{color:'#00e6b8',marginBottom:10}}>{item.book.name[0]}</H1>
+          </View>
+          <View>
+            <H3 style={{marginBottom:10}}>
+              {item.book.author[0]}
+            </H3>
+          </View>
+        </View>
+        <View style={{alignItems:'flex-start',margin:10}}>
+          <View >
+            <Text style={stylos.bold}>Autor:<Text style={stylos.normal}>{item.user.name[0]} {item.user.surname[0]}</Text> </Text>
+          </View>
+          <View>
+            <Text style={stylos.bold}>Datum pridania: <Text style={stylos.normal}>{item.conf.created_at[0]}</Text></Text>
+          </View>
+          <View>
+            <Text style={stylos.bold}>Kontrola zakázaných výrazov: <Text style={{color:'green'}}>{expresion}</Text></Text>
+          </View>
+        </View>
+        <View>
+          <Card style={{backGroundColor:'grey',font:10,flex:1,margin:10}}>
+            <Text style={{padding:5}}>
+              {item.conf.text[0]}
+              </Text>
+          </Card>
+        </View>
+        <View width="92%" style={{flexDirection:'row',flex:1,alignSelf: 'stretch',margin:10}}>
+          <Left>
+            <Text >Obsahuje spojler : </Text>
+          </Left>
+          <Right>
+            <CheckBox />
+          </Right>
+        </View>
+        <View width="100%" style={{flexDirection:'row',flex:1,alignSelf: 'stretch',margin:10}}>
+          <Left>
+            <Button
+            block
+            width="90%"
+            success
+            onPress={() => {
+            }}
+            >
+              <Text> Schváliť</Text>
+            </Button>
+          </Left>
+          <Right>
+            <Button
+            block
+            width="90%"
+            danger
+            onPress={() => {
+            }}
+            >
+              <Text> Zamietnúť </Text>
+            </Button>
+          </Right>
+        </View>
+      </Content>
     </Container>
     );
+  }
+}
+const stylos={
+  bold:{
+    fontWeight: 'bold',
+  },
+  normal:{
+    fontWeight: 'normal',
   }
 }
