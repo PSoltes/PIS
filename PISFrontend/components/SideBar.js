@@ -7,12 +7,11 @@ import update from "../scripts/Update.js";
 
 function AdminOrNot(props)
   {
-    console.log(props.admin);
       if(props.admin==true)
       {
         return (<ListItem
           button
-          onPress={() => this.props.navigation.navigate("AdminListScreen")}
+          onPress={() => props.nav.navigate("AdminListScreen")}
         >
           <Text>Príspevky na potvrdenie</Text>
           </ListItem>);
@@ -21,7 +20,7 @@ function AdminOrNot(props)
       {
         return ( <ListItem
           button
-          onPress={() => this.props.navigation.navigate("Home")}
+          onPress={() => props.nav.navigate("Home")}
         >
           <Text>Moje Knihy</Text>
         </ListItem>);
@@ -79,12 +78,9 @@ export default class SideBar extends React.Component {
           <H3>Ahoj</H3>
         </Header>
         <List>
-          <AdminOrNot admin={this.props.admin}/>         
+          <AdminOrNot admin={this.props.admin} nav={this.props.navigation}/>         
           <ListItem button onPress={this.logOff.bind(this)}>
             <Text>Odhlásiť sa!</Text>
-          </ListItem>
-          <ListItem button onPress={() => console.log(this.props.admin)}>
-            <Text>Odhlásiť saa!</Text>
           </ListItem>
         </List>
       </Content>

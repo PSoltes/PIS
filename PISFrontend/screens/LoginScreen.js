@@ -15,10 +15,11 @@ import {
   StyleProvider,
   Toast
 } from "native-base";
+import { ActivityIndicator } from "react-native";
 import getByAttribute from "../scripts/GetByAttribute.js";
 import update from "../scripts/Update.js";
 import dearray from "../scripts/Dearray.js";
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from "@react-native-community/async-storage";
 const uuidv4 = require("uuid/v4");
 
 export default class LoginScreen extends React.Component {
@@ -27,14 +28,18 @@ export default class LoginScreen extends React.Component {
     this.state = {
       email: "",
       password: "",
-      showToast: false
+      showToast: false,
+      loggingIn: false
     };
   }
 
+
   async login(email, password) {
-    const that = this;
+    this.setState({
+      loggingIn: true
+    });
     getByAttribute("email", email, "user").then(
-      async (user) => {
+      async user => {
         user = dearray(user[0]);
         if (user && user.is_blocked == "true") {
           Toast.show({
@@ -46,7 +51,6 @@ export default class LoginScreen extends React.Component {
         } else if (user && user.password == password) {
           user.api_token = uuidv4();
           user.login_counter = 0;
-          
 
           try {
             AsyncStorage.setItem("id", user.id);
@@ -55,12 +59,10 @@ export default class LoginScreen extends React.Component {
             console.log("posral sa async store " + error);
           }
           await update(user, user.id, "user");
-          if(user.is_admin == "true")
-          {
+          this.setState({ loggingIn: false });
+          if (user.is_admin == "true") {
             this.props.navigation.navigate("AdminListScreen");
-          }
-          else
-          {
+          } else {
             this.props.navigation.navigate("Home");
           }
         } else {
@@ -87,6 +89,20 @@ export default class LoginScreen extends React.Component {
   }
 
   render() {
+    let button;
+    if (this.state.loggingIn) {
+      button = <ActivityIndicator size="small" color="#0FDDAF" />;
+    } else {
+      button = (
+        <Button
+          block
+          width="70%"
+          onPress={this.login.bind(this, this.state.email, this.state.password)}
+        >
+          <Text> Prihlásiť </Text>
+        </Button>
+      );
+    }
     return (
       <StyleProvider style={getTheme(material)}>
         <Container style={{ backgroundColor: "transparent" }}>
@@ -140,19 +156,7 @@ export default class LoginScreen extends React.Component {
                 />
               </Item>
             </View>
-            <Item>
-              <Button
-                block
-                width="70%"
-                onPress={this.login.bind(
-                  this,
-                  this.state.email,
-                  this.state.password
-                )}
-              >
-                <Text> Prihlásiť </Text>
-              </Button>
-            </Item>
+            <Item>{button}</Item>
           </Content>
         </Container>
       </StyleProvider>

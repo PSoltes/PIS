@@ -20,6 +20,7 @@ import getById from "../scripts/GetById.js";
 import getByAttribute from "../scripts/GetByAttribute.js";
 import dearray from "../scripts/Dearray.js";
 import images from "../img/images.js";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export default class HomeScreen extends Component {
   closeDrawer() {
@@ -40,33 +41,39 @@ export default class HomeScreen extends Component {
   componentDidMount() {
     var book_ids = [];
     var myPromises = [];
+    AsyncStorage.getItem("id").then(
+      id => {
+        auth().then(loginResult => {
+          if (loginResult) {
+            console.log("auth");
+            getByAttribute("user_id", id, "book_loan").then(result => {
+              result.forEach(book_loan => {
+                book_ids.push(book_loan.book_id[0]);
+              });
 
-    auth().then(loginResult => {
-      if (loginResult) {
-        console.log("auth");
-        getByAttribute("user_id", 187700, "book_loan").then(result => {
-          result.forEach(book_loan => {
-            book_ids.push(book_loan.book_id[0]);
-          });
+              book_ids = [...new Set(book_ids)];
 
-          book_ids = [...new Set(book_ids)];
+              book_ids.forEach(book_id => {
+                myPromises.push(getById(book_id, "book"));
+              });
 
-          book_ids.forEach(book_id => {
-            myPromises.push(getById(book_id, "book"));
-          });
-
-          Promise.all(myPromises).then(booksUp => {
-            booksUp.forEach(book => {
-              book = dearray(book);
+              Promise.all(myPromises).then(booksUp => {
+                booksUp.forEach(book => {
+                  book = dearray(book);
+                });
+                console.warn(booksUp);
+                this.setState({ books: booksUp });
+              });
             });
-            console.log(booksUp);
-            this.setState({ books: booksUp });
-          });
+          } else {
+            this.props.navigation.navigate("Login");
+          }
         });
-      } else {
-        this.props.navigation.navigate("Login");
+      },
+      err => {
+        console.warn(err);
       }
-    });
+    );
   }
   render() {
     const bookList = this.state.books.map(book => {
@@ -74,7 +81,7 @@ export default class HomeScreen extends Component {
         <Card style={{ height: "20%", width: "100%" }}>
           <CardItem
             button
-            onPress={() => console.log("aaaaaand open")}
+            onPress={() => this.props.navigation.navigate("BookDetail", {'book':book})}
             style={{
               height: "100%",
               paddingLeft: 0,
