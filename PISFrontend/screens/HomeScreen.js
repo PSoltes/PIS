@@ -8,7 +8,7 @@ import {
   Drawer,
   StyleProvider,
   Card,
-  H3,
+  H2,
   Text,
 } from "native-base";
 import { Image } from "react-native";

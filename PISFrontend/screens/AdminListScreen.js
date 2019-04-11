@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import getTheme from "../native-base-theme/components";
 import material from "../native-base-theme/variables/material";
-import { Container, Content, Header, Left, Body, Right, Button, Icon, Title,Text,Card,CardItem,H3,H1} from 'native-base';
+import { Container, Content, Header, Left, Body, Right, Button, Icon, Title,Text,Card,CardItem,H3,H1,H2} from 'native-base';
 import {FlatList,View} from 'react-native';
 import getByAttribute from "../scripts/GetByAttribute";
 import getById from '../scripts/GetById';
-
+import Dearray from '../scripts/Dearray';
 
 export default class AdminListScreen extends Component {
 
@@ -15,26 +15,26 @@ export default class AdminListScreen extends Component {
      confirms: ''
     };
   }
-  async componentWillMount(){
-    let cf= [];
+  async LoadComments(){
+    let confarr= [];
     await getByAttribute('approved_at', null, 'comment').then(
     function(conf) {
       console.log(conf);
-      cf=conf;
+      confarr=conf;
     },
     function(err) {
       console.log(err);
     }
     );
-   let arr=[];
-  if(cf){
-    for(let c in cf){
+   let finarr=[];
+  if(confarr){
+    for(let obj in confarr){
       let usr=''; let book='';
-      console.log(cf[c].user_id[0]+" - "+cf[c].book_id[0]);
-      let bkid=cf[c].book_id[0];let usrid=cf[c].user_id[0];
+      console.log(confarr[obj].user_id[0]+" - "+confarr[obj].book_id[0]);
+      let bkid=confarr[obj].book_id[0];let usrid=confarr[obj].user_id[0];
       await getById(usrid,'user').then(
-      function(us) {;
-        usr=us;
+      function(user) {;
+        usr=Dearray(user);
       },
       function(err) {
         console.log(err);
@@ -42,24 +42,25 @@ export default class AdminListScreen extends Component {
       );
       console.log(usr);
       await getById(bkid,'book').then(
-      function(conf) {
-        book=conf;
+      function(respons) {
+        book=Dearray(respons);
       },
       function(err) {
         console.log(err);
       }
       );
-      let obj = {key:cf[c].id[0],book:book,conf:cf[c],type:'Komentár',user:usr};
-      arr.push(obj);
+      let object = {key:confarr[obj].id[0],book:book,conf:Dearray(confarr[obj]),type:'Komentár',user:usr};
+      finarr.push(object);
     }
-    this.setState({confirms:arr});
+    this.setState({confirms:finarr});
     console.log(this.state.confirms);
   }
 
   }
+  async componentWillMount(){
+    this.LoadComments();
+  }
   render() {
-    const { navigation } = this.props;
-    const name = navigation.getParam('name', '');
     return (
     <Container>
       <Header style={{ backgroundColor: '#00e6b8'}} androidStatusBarColor="#00e6b8">
@@ -67,6 +68,13 @@ export default class AdminListScreen extends Component {
         <Title>Potvrdenia</Title>
         </Body>
         <Right>
+        <Button transparent
+         onPress={() => {
+          this.LoadComments();
+        }}
+        >
+            <Icon name="sync" />
+          </Button>
           <Button transparent>
             <Icon name="menu" />
           </Button>
@@ -88,20 +96,20 @@ export default class AdminListScreen extends Component {
             <Body width="100%">
             <View width="100%">
                 <View>
-                  <H3 style={{color:'#00e6b8'}}>{item.book.name[0]}</H3>
+                  <H3 style={{color:'#00e6b8'}}>{item.book.name}</H3>
                 </View>
                 <View  width="100%" style={{font:15,flex:1,flexDirection:'row',alignSelf: 'stretch'}}>
                   <View>
                   <Text>
-                    {item.book.author[0]}
+                    {item.book.author}
                   </Text>
                     <Text>
-                      {item.user.name[0]} {item.user.surname[0]}
+                      {item.user.name} {item.user.surname}
                     </Text>
                   </View>
                   <Right>
                         <Text>{item.type} </Text>
-                        <Text>{item.conf.created_at[0]}</Text>
+                        <Text>{item.conf.created_at}</Text>
                   </Right>
                 </View>
             </View>
