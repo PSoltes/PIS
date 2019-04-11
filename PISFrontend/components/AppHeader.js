@@ -13,7 +13,7 @@ export default class AppHeader extends React.Component {
           <Title>{this.props.title}</Title>
         </Body>
         <Right>
-          <Button transparent onPress={this.openDrawer}>
+          <Button transparent onPress={this.props.openDrawer}>
             <Icon name="menu" />
           </Button>
         </Right>

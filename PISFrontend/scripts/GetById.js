@@ -18,8 +18,6 @@ export default async function getById(id, entity) {
       }
     });
     const response = await soapRequest.sendRequest();
-    console.log(response);
-
     if (
     response["SOAP-ENV:Envelope"]["SOAP-ENV:Body"]["0"][
     "ns1:getByIdResponse"]["0"].hasOwnProperty(entity)

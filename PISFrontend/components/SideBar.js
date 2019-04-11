@@ -5,6 +5,28 @@ import getById from "../scripts/GetById.js";
 import dearray from "../scripts/Dearray.js";
 import update from "../scripts/Update.js";
 
+function AdminOrNot(props)
+  {
+      if(props.admin==true)
+      {
+        return (<ListItem
+          button
+          onPress={() => props.nav.navigate("AdminListScreen")}
+        >
+          <Text>Príspevky na potvrdenie</Text>
+          </ListItem>);
+      }
+      else
+      {
+        return ( <ListItem
+          button
+          onPress={() => props.nav.navigate("Home")}
+        >
+          <Text>Moje Knihy</Text>
+        </ListItem>);
+      }
+  }
+
 export default class SideBar extends React.Component {
   async logOff() {
     try {
@@ -31,13 +53,16 @@ export default class SideBar extends React.Component {
     try {
       AsyncStorage.removeItem("id");
       AsyncStorage.removeItem("api_token");
-      this.props.closeDrawer();
+      this.props.closeDrawer;
       this.props.navigation.navigate("Login")
     } catch (error) {
       console.log(error);
     }
   }
+
+  
   render() {
+    
     return (
       <Content style={{ backgroundColor: "#FFFFFF" }}>
         <Header
@@ -50,15 +75,10 @@ export default class SideBar extends React.Component {
             paddingVertical:"10%"
           }}
         >
-          <H3>Ahoj {this.props.name}</H3>
+          <H3>Ahoj</H3>
         </Header>
         <List>
-          <ListItem
-            button
-            onPress={() => this.props.navigation.navigate("Home")}
-          >
-            <Text>Moje Knihy</Text>
-          </ListItem>
+          <AdminOrNot admin={this.props.admin} nav={this.props.navigation}/>         
           <ListItem button onPress={this.logOff.bind(this)}>
             <Text>Odhlásiť sa!</Text>
           </ListItem>
