@@ -1,8 +1,9 @@
 import SoapRequest from "react-native-soap-request";
 
-export default async function email(email, subject, message)
+export default async function sendEmail(email, subject, message)
 {
     return new Promise( async function(resolve, reject){
+      console.warn(email + subject + message);
 
         const soapRequest = new SoapRequest({
           requestURL: "http://labss2.fiit.stuba.sk/pis/ws/NotificationServices/Email"
@@ -21,6 +22,8 @@ export default async function email(email, subject, message)
             'message': message
           }
         });
+        
+        console.warn(soapRequest);
         const response = await soapRequest.sendRequest();
     
         resolve(response);
