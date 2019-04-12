@@ -1,27 +1,50 @@
 import React, { Component } from "react";
 import getTheme from "../native-base-theme/components";
 import material from "../native-base-theme/variables/material";
-import { Container, Content, Header, Left, Body, Right, Button, Icon, Title } from 'native-base';
+import { Container, Content, StyleProvider, Drawer } from 'native-base';
+import AppHeader from "../components/AppHeader.js";
+import SideBar from "../components/SideBar.js"
 
 
 export default class BookDetail extends Component {
 
+  closeDrawer() {
+    this.drawer._root.close();
+  }
+
+  openDrawer() {
+    this.drawer._root.open();
+  }
+
   render() {
     const { navigation } = this.props;
-    const name = navigation.getParam('name', '');
+    const book = navigation.getParam("book");
     return (
-    <Container>
-      <Header style={{ backgroundColor: '#00e6b8'}} androidStatusBarColor="#00e6b8">
-        <Body>
-        <Title>Dobrý deň {name}</Title>
-        </Body>
-        <Right>
-          <Button transparent>
-            <Icon name="menu" />
-          </Button>
-        </Right>
-      </Header>
-    </Container>
-    );
+      <StyleProvider style={getTheme(material)}>
+      <Drawer
+        ref={ref => {
+          this.drawer = ref;
+        }}
+        content={
+          <SideBar
+            navigation={this.props.navigation}
+            closeDrawer={() => this.props.closeDrawer()}
+          />
+        }
+        onClose={() => this.closeDrawer()}
+      >
+        <Container>
+          <AppHeader
+            title={book.name}
+            openDrawer={() => this.openDrawer()}
+          />
+          <Content
+            contentContainerStyle={{ flex: 1, alignItems: "center" }}
+            padder
+          >
+          </Content>
+        </Container>
+      </Drawer>
+    </StyleProvider>);
   }
 }
