@@ -41,10 +41,7 @@ export default class AddReviewScreen extends Component {
     review.approved_at = null;
     review.spoiler_flag = false;
 
-    console.warn(review);
-
     if(!review.id){
-      console.warn("BOL SOM V IFE");
       review.name = "review";
       review.book_id = this.props.navigation.getParam("book").id;
       review.user_id = this.state.my_id;

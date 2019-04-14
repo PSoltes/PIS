@@ -345,7 +345,7 @@ export default class BookDetail extends Component {
                 </CardItem>
                 <CardItem footer bordered>
                     <Grid>
-                        <Col size={70}>
+                        <Col size={60}>
                             <Row>
                                 <Moment element={Text} format="YYYY-MM-DD HH:mm">{comment.created_at}</Moment>
                             </Row>
@@ -354,10 +354,10 @@ export default class BookDetail extends Component {
                                 <Text>{comment.user_surname}</Text>
                             </Row>
                         </Col>
-                        <Col size={15}>
+                        <Col style={{alignItems: "flex-end"}} size={20}>
                             {button_edit}
                         </Col>
-                        <Col size={15}>
+                        <Col style={{alignItems: "flex-end"}} size={20}>
                             {button_delete}
                         </Col>
                     </Grid>
@@ -423,14 +423,14 @@ export default class BookDetail extends Component {
                          borderBottomWidth: 1,
                          paddingBottom: 5
                        }}>
-                    <Col size={40}>
+                    <Col size={35}>
                         <Image
                             source={images[book.picture_path]}
                             resizeMode="cover"
                             style={{ paddingTop: 3, paddingBottom: 3, height: "100%", width: "100%"}}
                         />
                     </Col>
-                    <Col size={60}>
+                    <Col size={65}>
                         <Row size={1}>
                             <H2 style={{ color: "#0FDDAF" }}>{book.name}</H2>
                         </Row>
@@ -454,8 +454,6 @@ export default class BookDetail extends Component {
                 <Row style={{marginTop: 10}}>
                     <Col>
                     <H2>Komentáre:</H2>
-                {/*</Row>*/}
-                {/*<Row style={{height: 20}}>*/}
                     <ListItem>
                     <CheckBox
                         style={{color: "#0FDDAF", marginRight: 30}}
@@ -467,12 +465,6 @@ export default class BookDetail extends Component {
                     />
                     <Text>Zobraziť moje komentáre</Text>
                     </ListItem>
-
-                {/*</Row>*/}
-                {/*<Row style={{paddingTop: 30, width: "100%"}}>
-                    <Button style={{width: "100%", justifyContent: 'center', flex: 1}}>
-                        <Text>Pridať komentár</Text>
-                    </Button>*/}
                     <Item style={{backgroundColor: "#e8ebef"}}>
                         <Input
                             placeholder='Napíšte svoj komentár'
