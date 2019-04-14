@@ -81,7 +81,9 @@ export default class HomeScreen extends Component {
         <Card style={{ height: "20%", width: "100%" }}>
           <CardItem
             button
-            onPress={() => this.props.navigation.navigate("BookDetail", {'book':book})}
+            onPress={() =>
+              this.props.navigation.navigate("BookDetail", { book: book })
+            }
             style={{
               height: "100%",
               paddingLeft: 0,

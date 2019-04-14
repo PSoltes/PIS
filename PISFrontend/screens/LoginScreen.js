@@ -21,6 +21,8 @@ import update from "../scripts/Update.js";
 import dearray from "../scripts/Dearray.js";
 import AsyncStorage from "@react-native-community/async-storage";
 const uuidv4 = require("uuid/v4");
+import Modal from "react-native-modal";
+import sendEmail from "../scripts/Email.js"
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -29,63 +31,190 @@ export default class LoginScreen extends React.Component {
       email: "",
       password: "",
       showToast: false,
-      loggingIn: false
+      loggingIn: false,
+      passwordRecovery: false,
+      unblockUser: false,
+      recoveryUnblockEmail: "",
+      unblockToken: ""
     };
   }
 
+  login(email, password) {
+    if (!email || !password) {
+      Toast.show({
+        text: "Nezadané heslo alebo mail",
+        buttonText: "OK",
+        type: "danger"
+      });
 
-  async login(email, password) {
+      return;
+    }
     this.setState({
       loggingIn: true
     });
-    getByAttribute("email", email, "user").then(
-      async user => {
-        user = dearray(user[0]);
-        if (user && user.is_blocked == "true") {
-          Toast.show({
-            text:
-              "Účet používateľa je zablokovaný. Na mail bola zaslaná správa pre odblokovanie",
-            buttonText: "OK",
-            type: "danger"
-          });
-        } else if (user && user.password == password) {
-          user.api_token = uuidv4();
-          user.login_counter = 0;
+    getByAttribute("email", email, "user")
+      .then(user => {
+          user = dearray(user[0]);
+          if (user && user.is_blocked == "true") {
+            Toast.show({
+              text:
+                "Účet používateľa je zablokovaný. Na mail bola zaslaná správa pre odblokovanie",
+              buttonText: "OK",
+              type: "danger"
+            });
+            this.setState({ loggingIn: false });
+          } else if (user && user.password == password) {
+            user.api_token = uuidv4();
+            user.login_counter = 0;
 
-          try {
-            AsyncStorage.setItem("id", user.id);
-            AsyncStorage.setItem("api_token", user.api_token);
-          } catch (error) {
-            console.log("posral sa async store " + error);
-          }
-          await update(user, user.id, "user");
-          this.setState({ loggingIn: false });
-          if (user.is_admin == "true") {
-            this.props.navigation.navigate("AdminListScreen");
-          } else {
-            this.props.navigation.navigate("Home");
-          }
-        } else {
-          if (user) {
-            user.login_counter = parseInt(user.login_counter) + 1;
-            if (user.login_counter >= 3) {
-              user.is_blocked = true;
-              //dorobit mail pre odblokovanie
+            try {
+              AsyncStorage.setItem("id", user.id);
+              AsyncStorage.setItem("api_token", user.api_token);
+            } catch (error) {
+              console.log("posral sa async store " + error);
+              throw error;
             }
-            update(user, user.id, "user");
+            update(user, user.id, "user")
+              .then(result => {
+                this.setState({
+                  loggingIn: false,
+                  email: "",
+                  password: ""
+                });
+                if (user.is_admin == "true") {
+                  this.props.navigation.navigate("AdminListScreen");
+                } else {
+                  this.setState({
+                    email: "",
+                    password: ""
+                  });
+                  this.props.navigation.navigate("Home");
+                }
+              })
+              .catch(err => {
+                throw err;
+              });
+          } else {
+            if (user) {
+              user.login_counter = parseInt(user.login_counter) + 1;
+              if (user.login_counter >= 3) {
+                user.is_blocked = true;
+                user.block_token = uuidv4();
+                console.warn(user.email);
+                sendEmail(
+                  user.email,
+                  "Informačný systém Knižnica - účet zablokovaný",
+                  "Váš účet bolo zablokovaný z dôvodu troch nesprávnych pokusov o prihlásenie. Pre jeho odblokovanie choďte do aplikácie a na úvodnej ploche zvoľte možnosť odblokovať účet a zadajte váš email a nasledujúci token: " +
+                    user.block_token
+                )
+                  .then(response => {
+                    console.warn(response);
+                  })
+                  .catch(err => {
+                    console.warn("email " + err);
+                    throw err;
+                  });
+              }
+              update(user, user.id, "user").then(result => {
+                this.setState({ loggingIn: false });
+              });
+            }
+            Toast.show({
+              text: "Nesprávne meno alebo heslo!",
+              buttonText: "OK",
+              duration: 3000,
+              type: "danger"
+            });
           }
+        },
+        function(err) {
+          console.log(err);
+        }
+      )
+      .catch(err => {
+        console.log(err);
+        //this.props.navigation.navigate("ErrorScreen"); show err screen :D
+      });
+  }
+
+  sendPassword() {
+    getByAttribute("email", this.state.recoveryUnblockEmail, "user")
+      .then(user => {
+        if (user) {
+          user = dearray(user[0]);
+          sendEmail(
+            user.email,
+            "Heslo z IS Knižnica",
+            "Vaše heslo je " + user.password
+          )
+            .then(response => {
+              this.setState({
+                recoveryUnblockEmail: "",
+                passwordRecovery: false
+              });
+              Toast.show({
+                text: "Heslo odoslané",
+                buttonText: "OK",
+                duration: 3000,
+                type: "success"
+              });
+            })
+            .catch(err => {
+              throw err;
+            });
+        } else {
           Toast.show({
-            text: "Nesprávne meno alebo heslo!",
+            text: "Neexistujúce konto",
             buttonText: "OK",
             duration: 3000,
             type: "danger"
           });
         }
-      },
-      function(err) {
-        console.log(err);
-      }
-    );
+      })
+      .catch(
+        err => console.log(err) //errorScreen
+      );
+  }
+  unblockUser() {
+    getByAttribute("email", this.state.recoveryUnblockEmail, "user")
+      .then(user => {
+        user = dearray(user[0]);
+        if (user && user.block_token == this.state.unblockToken) {
+          user.is_blocked = false;
+          user.login_counter = 0;
+          user.block_token = "";
+          update(user, user.id, "user")
+            .then(response => {
+              this.setState({
+                recoveryUnblockEmail: "",
+                unblockToken: "",
+                unblockUser: false
+              });
+              Toast.show({
+                text: "Účet bol odblokovaný",
+                buttonText: "OK",
+                duration: 3000,
+                type: "success"
+              });
+            })
+            .catch(err => {
+              throw err;
+            });
+        } else {
+          console.warn(user);
+          Toast.show({
+            text: "Neexistujúce konto",
+            buttonText: "OK",
+            duration: 3000,
+            type: "danger"
+          });
+        }
+      })
+      .catch(
+        err => {
+          console.log(err);
+        } //errscreen
+      );
   }
 
   render() {
@@ -115,6 +244,104 @@ export default class LoginScreen extends React.Component {
               alignItems: "center"
             }}
           >
+            <Modal
+              isVisible={this.state.passwordRecovery}
+              onBackdropPress={() =>
+                this.setState({
+                  passwordRecovery: !this.state.passwordRecovery
+                })
+              }
+            >
+              <View
+                style={{
+                  justifyContent: "space-between",
+                  backgroundColor: "#fff",
+                  height: 200,
+                  alignItems: "center",
+                  padding: "5%",
+                  borderRadius: 7
+                }}
+              >
+                <H3>Zadaj email svojho účtu</H3>
+                <Item
+                  floatingLabel
+                  underline
+                  style={{
+                    width: "90%"
+                  }}
+                >
+                  <Label>Email</Label>
+                  <Input
+                    name="email"
+                    onChangeText={text =>
+                      this.setState({ recoveryUnblockEmail: text })
+                    }
+                    value={this.state.recoveryUnblockEmail}
+                  />
+                </Item>
+                <Button
+                  style={{ alignSelf: "center" }}
+                  onPress={this.sendPassword.bind(this)}
+                >
+                  <Text>Odošli heslo</Text>
+                </Button>
+              </View>
+            </Modal>
+            <Modal
+              isVisible={this.state.unblockUser}
+              onBackdropPress={() =>
+                this.setState({ unblockUser: !this.state.unblockUser })
+              }
+            >
+              <View
+                style={{
+                  justifyContent: "space-between",
+                  backgroundColor: "#fff",
+                  height: 300,
+                  alignItems: "center",
+                  padding: "5%",
+                  borderRadius: 7
+                }}
+              >
+                <H3>Zadaj email svojho účtu a token na jeho odblokovanie</H3>
+                <Item
+                  floatingLabel
+                  underline
+                  style={{
+                    width: "90%"
+                  }}
+                >
+                  <Label>Email</Label>
+                  <Input
+                    name="email"
+                    onChangeText={text =>
+                      this.setState({ recoveryUnblockEmail: text })
+                    }
+                    value={this.state.recoveryUnblockEmail}
+                  />
+                </Item>
+                <Item
+                  floatingLabel
+                  underline
+                  style={{
+                    width: "90%"
+                  }}
+                >
+                  <Label>Token</Label>
+                  <Input
+                    name="token"
+                    onChangeText={text => this.setState({ unblockToken: text })}
+                    value={this.state.unblockToken}
+                  />
+                </Item>
+                <Button
+                  style={{ alignSelf: "center" }}
+                  onPress={this.unblockUser.bind(this)}
+                >
+                  <Text>Odblokuj používateľa</Text>
+                </Button>
+              </View>
+            </Modal>
             <View
               style={{
                 width: "100%",
@@ -155,6 +382,26 @@ export default class LoginScreen extends React.Component {
                   value={this.state.password}
                 />
               </Item>
+              <Button
+                transparent
+                style={{ height: 30, alignSelf: "center" }}
+                onPress={() =>
+                  this.setState({
+                    passwordRecovery: !this.state.passwordRecovery
+                  })
+                }
+              >
+                <Text>Zabudol si heslo?</Text>
+              </Button>
+              <Button
+                transparent
+                style={{ height: 30, alignSelf: "center" }}
+                onPress={() =>
+                  this.setState({ unblockUser: !this.state.unblockUser })
+                }
+              >
+                <Text>Odblokuj účet</Text>
+              </Button>
             </View>
             <Item>{button}</Item>
           </Content>

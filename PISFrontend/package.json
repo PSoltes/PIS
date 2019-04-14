@@ -18,6 +18,7 @@
     "react-native-comments": "^1.1.4",
     "react-native-gesture-handler": "^1.1.0",
     "react-native-ratings": "^6.3.1",
+    "react-native-modal": "^9.0.0",
     "react-native-soap-request": "0.0.2",
     "react-native-vector-icons": "^6.4.2",
     "react-native-xml2js": "^1.0.3",
