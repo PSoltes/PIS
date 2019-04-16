@@ -25,7 +25,7 @@ import {
 import AppHeader from "../components/AppHeader.js";
 import SideBar from "../components/SideBar.js"
 
-import { Image, TouchableOpacity } from "react-native";
+import { Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Grid, Col, Row } from "react-native-easy-grid";
 import images from "../img/images.js";
 import auth from "../scripts/Auth.js";
@@ -36,6 +36,7 @@ import getById from '../scripts/GetById.js';
 import insert from '../scripts/Insert.js';
 import update from '../scripts/Update.js';
 import remove from '../scripts/Delete.js';
+import email from '../scripts/Email.js';
 
 import Moment from 'react-moment';
 import { Rating, AirbnbRating } from 'react-native-ratings';
@@ -55,6 +56,7 @@ export default class BookDetail extends Component {
             comments: [],
             only_mine_checked: false,
             my_id: 0,
+            my_email: '',
             new_comment_text: '',
             comment_id: '',
             comment: '',
@@ -62,12 +64,15 @@ export default class BookDetail extends Component {
             rating: 0,
             my_rating: 0,
             my_rating_id: '',
-            rating_count: 0
+            rating_count: 0,
+            isLoading: false,
+            modal_visible: false
         };
     }
 
     findComments(){
         let approvedComments = [];
+        this.setState({isLoading: true});
         getByAttribute("book_id", this.props.navigation.getParam("book").id, "comment").then(result => {
             if (result != null){
                 result.forEach(comment => {
@@ -92,7 +97,7 @@ export default class BookDetail extends Component {
                                     approvedComments.push(comment);
                                     this.setState({ comments: approvedComments });
                                 }
-
+                                this.setState({isLoading: false});
                             }
                         });
                     }
@@ -103,12 +108,14 @@ export default class BookDetail extends Component {
     }
 
     findReview(){
+        this.setState({isLoading: true});
         getByAttribute("book_id", this.props.navigation.getParam("book").id, "review").then(result => {
             if (result != null){
                 result.forEach( review => {
                    review = dearray(review);
                    if(review.approved_at != 'null' || review.user_id == this.state.my_id){
                      this.setState({review: review});
+                     this.setState({isLoading: false});
                      return;
                    }
                 });
@@ -116,12 +123,14 @@ export default class BookDetail extends Component {
             else{
                 this.setState({review: ''});
             }
+            this.setState({isLoading: false});
         });
     }
 
     findRating(){
         let totalRating = 0;
         let counter = 0;
+        this.setState({isLoading: true});
         getByAttribute("book_id", this.props.navigation.getParam("book").id, "evaluation").then(result => {
             if (result != null){
                 result.forEach(evaluation => {
@@ -137,10 +146,12 @@ export default class BookDetail extends Component {
             else{
                 this.setState({rating: 0, my_rating: 0, rating_count: 0});
             }
+            this.setState({isLoading: false});
         });
     }
 
     insertComment(){
+        this.setState({isLoading: true});
         if (this.state.comment_id == '' && this.state.new_comment_text != ''){
             let comment = {};
             comment.id = 0;
@@ -152,15 +163,19 @@ export default class BookDetail extends Component {
             comment.approved_at = null;
             comment.text = this.state.new_comment_text;
             comment.spoiler_flag = false;
+            email(this.state.my_email,
+                      "Informačný systém knižnica - komentár pridaný",
+                      "Vaš komentár bol úspešne pridaný, prosím počkajte na jeho schválenie pracovníkom knižnice.");
             insert(comment, 'comment').then( res => {
                     this.findComments();
-                    this.setState({ comment_id: null, comment: null, new_comment_text: '' });
+                    this.setState({ comment_id: '', comment: '', new_comment_text: '' });
                     Toast.show({
                         text: "Komentár bol odoslaný na schválenie.",
                         buttonText: "OK",
                         duration: 3000,
                         type: "info"
                     });
+                    this.setState({isLoading: false});
                 }
             );
         }
@@ -169,21 +184,26 @@ export default class BookDetail extends Component {
             this.state.comment.has_wrong_expression = false;
             this.state.comment.approved_at = null;
             this.state.comment.spoiler_flag = false;
+            email(this.state.my_email,
+                      "Informačný systém knižnica - komentár zmenený",
+                      "Vaš komentár bol úspešne zmenený, prosím počkajte na jeho schválenie pracovníkom knižnice.");
             update(this.state.comment, this.state.comment_id, 'comment').then( res => {
                     this.findComments();
-                    this.setState({ comment_id: null, comment: null, new_comment_text: '' });
+                    this.setState({ comment_id: '', comment: '', new_comment_text: '' });
                     Toast.show({
                         text: "Komentár bol odoslaný na schválenie.",
                         buttonText: "OK",
                         duration: 3000,
                         type: "info"
                     });
+                    this.setState({isLoading: false});
                 }
             );
         }
     }
 
     deleteComment(toDelete){
+        this.setState({isLoading: true});
         remove(toDelete, 'comment').then(res => {
             this.findComments();
             this.setState({ comment_id: null, comment: null, new_comment_text: '' });
@@ -193,10 +213,12 @@ export default class BookDetail extends Component {
                 duration: 3000,
                 type: "info"
             });
+            this.setState({isLoading: false});
         });
     }
 
     deleteReview(toDelete){
+        this.setState({isLoading: true});
         remove(toDelete, 'review').then(res => {
             this.setState({ review: '' });
             Toast.show({
@@ -205,16 +227,20 @@ export default class BookDetail extends Component {
                 duration: 3000,
                 type: "info"
             });
+            this.setState({isLoading: false});
         });
     }
 
     componentDidMount() {
+        this.setState({isLoading: true});
         AsyncStorage.getItem("id").then(
             id => {
                 this.setState({ my_id: id });
                 auth().then(loginResult => {
                     if (loginResult) {
-
+                        AsyncStorage.getItem("email").then( email => {
+                            this.setState({my_email: email});
+                        });
                         console.log("auth");
                         this.findReview();
                         this.findRating();
@@ -230,6 +256,44 @@ export default class BookDetail extends Component {
     }
 
     _renderHeader(item, expanded) {
+        let button_edit_review;
+        let button_remove_review;
+        let review_not_approved;
+        if (this.state.review.approved_at == 'null'){
+            review_not_approved = (
+                <Icon style={{ color: "orange" }} type="FontAwesome" name="exclamation-triangle"
+                    onPress={() =>{
+                        Toast.show({
+                            text: "Recenzia nie je schválena.",
+                            duration: 3000,
+                            type: "warning"
+                        });
+                    }}
+                />
+            )
+        }
+        if (this.state.review.user_id == this.state.my_id){
+            if (expanded){
+                button_edit_review = (
+                    <Icon style={{ color: "white" }} type="FontAwesome" name="pencil"
+                        onPress={() =>{
+                            this.props.navigation.navigate("AddReviewScreen", {review: this.state.review, book: this.props.navigation.getParam("book")});
+                        }}
+                    />
+                );
+                button_remove_review = (
+                    <Icon style={{ color: "white" }} type="FontAwesome" name="trash"
+                        onPress={() => {
+                            this.deleteReview(this.state.review.id);
+                        }}
+                    />
+                );
+            }
+        }
+        else{
+            button_edit_review = (<Icon/>);
+            button_remove_review = (<Icon/>);
+        }
         return (
           <View style={{
             flexDirection: "row",
@@ -239,30 +303,19 @@ export default class BookDetail extends Component {
             height: 35,
             backgroundColor: "#0FDDAF" }}>
                 <Grid>
-                        <Col size={55}>
+                        <Col style={{alignItems: "flex-start"}}size={25}>
                             <Text>
                                 {" "}{item.title}
                             </Text>
                         </Col>
-                        <Col style={{alignItems: "flex-end"}} size={15}>
-                            {expanded
-                                ?   <Icon style={{ color: "white" }} type="FontAwesome" name="pencil"
-                                        onPress={() =>{
-                                            this.props.navigation.navigate("AddReviewScreen", {review: this.state.review, book: this.props.navigation.getParam("book")});
-                                        }}
-                                    />
-                                :   <Icon/>
-                            }
+                        <Col size={15}>
+                            {review_not_approved}
+                        </Col>
+                        <Col style={{alignItems: "flex-end"}} size={30}>
+                            {button_edit_review}
                         </Col>
                         <Col style={{alignItems: "flex-end"}} size={15}>
-                            {expanded
-                                ?   <Icon style={{ color: "white" }} type="FontAwesome" name="trash"
-                                        onPress={() => {
-                                            this.deleteReview(this.state.review.id);
-                                        }}
-                                    />
-                                :   <Icon/>
-                            }
+                            {button_remove_review}
                         </Col>
                         <Col style={{alignItems: "flex-end"}} size={15}>
                             {expanded
@@ -276,6 +329,7 @@ export default class BookDetail extends Component {
     }
 
     ratingCompleted(newRating) {
+        this.setState({isLoading: true});
         let evaluation = {};
         evaluation.name = "rating";
         evaluation.book_id = this.props.navigation.getParam("book").id;
@@ -291,6 +345,7 @@ export default class BookDetail extends Component {
                     duration: 3000,
                     type: "info"
                 });
+                this.setState({isLoading: false});
             });
         }
         else{
@@ -303,6 +358,7 @@ export default class BookDetail extends Component {
                     duration: 3000,
                     type: "info"
                 });
+                this.setState({isLoading: false});
             });
         }
     }
@@ -314,6 +370,24 @@ export default class BookDetail extends Component {
     const commentsElements = this.state.comments.map(comment => {
         let button_edit;
         let button_delete;
+        let comment_not_approved;
+
+        if (this.state.my_id == comment.user_id && comment.approved_at == 'null'){
+            comment_not_approved = (
+                <Button transparent
+                    onPress={() =>{
+                        Toast.show({
+                            text: "Komentár nie je schválený.",
+                            duration: 3000,
+                            type: "warning"
+                        });
+                    }}
+                >
+                    <Icon style={{ color: "orange" }} type="FontAwesome" name="exclamation-triangle"/>
+                </Button>
+            )
+        };
+
         if (this.state.my_id == comment.user_id){
             button_edit = (
                 <Button transparent
@@ -336,6 +410,7 @@ export default class BookDetail extends Component {
                 </Button>
             );
         }
+
         return (
             <Card style={{width: "99%"}}>
                 <CardItem bordered>
@@ -345,7 +420,7 @@ export default class BookDetail extends Component {
                 </CardItem>
                 <CardItem footer bordered>
                     <Grid>
-                        <Col size={60}>
+                        <Col size={50}>
                             <Row>
                                 <Moment element={Text} format="YYYY-MM-DD HH:mm">{comment.created_at}</Moment>
                             </Row>
@@ -354,10 +429,13 @@ export default class BookDetail extends Component {
                                 <Text>{comment.user_surname}</Text>
                             </Row>
                         </Col>
-                        <Col style={{alignItems: "flex-end"}} size={20}>
+                        <Col size={20}>
+                            {comment_not_approved}
+                        </Col>
+                        <Col style={{alignItems: "flex-end"}} size={15}>
                             {button_edit}
                         </Col>
-                        <Col style={{alignItems: "flex-end"}} size={20}>
+                        <Col style={{alignItems: "flex-end"}} size={15}>
                             {button_delete}
                         </Col>
                     </Grid>
@@ -372,6 +450,7 @@ export default class BookDetail extends Component {
         reviewElement = (
             <Accordion
                 dataArray={data}
+                expanded
                 renderHeader={this._renderHeader.bind(this)}
                 contentStyle={{ backgroundColor: "#f0f2f5" }}
             />
@@ -390,7 +469,22 @@ export default class BookDetail extends Component {
         )
     }
 
-    return (
+    let wrapper;
+    if(this.state.isLoading == true){
+        wrapper = (
+            <Container>
+                <Content
+                    ref={c => (this.component = c)}
+                    contentContainerStyle={{alignItems: "center", justifyContent: "center", height: "100%", flex: 1}}
+                    padder
+                >
+                    <ActivityIndicator size="large" color="#0FDDAF" />
+                </Content>
+            </Container>
+        );
+    }
+    else {
+    wrapper = (
       <StyleProvider style={getTheme(material)}>
       <Drawer
         ref={ref => {
@@ -415,7 +509,6 @@ export default class BookDetail extends Component {
             padder
           >
           <Grid>
-
             <Col>
                 <Row style={{
                          height: 150,
@@ -489,6 +582,9 @@ export default class BookDetail extends Component {
           </Content>
         </Container>
       </Drawer>
-    </StyleProvider>);
+    </StyleProvider>
+    );
+    }
+    return wrapper;
   }
 }
