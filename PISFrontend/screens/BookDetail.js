@@ -37,6 +37,7 @@ import insert from '../scripts/Insert.js';
 import update from '../scripts/Update.js';
 import remove from '../scripts/Delete.js';
 import email from '../scripts/Email.js';
+import expression from '../scripts/WrongExpressionWS.js';
 
 import Moment from 'react-moment';
 import { Rating, AirbnbRating } from 'react-native-ratings';
@@ -160,9 +161,16 @@ export default class BookDetail extends Component {
             comment.book_id = this.props.navigation.getParam("book").id;
             comment.user_id = this.state.my_id;
             comment.created_at = Date();
-            comment.has_wrong_expression = false;
             comment.approved_at = null;
             comment.text = this.state.new_comment_text;
+
+            if (expression(comment.text) == 1){
+                comment.has_wrong_expression = true;
+            }
+            else{
+                comment.has_wrong_expression = false;
+            }
+
             comment.spoiler_flag = this.state.comment_is_spoiler;
             email(this.state.my_email,
                       "Informačný systém knižnica - komentár pridaný",
@@ -182,7 +190,14 @@ export default class BookDetail extends Component {
         }
         else if (this.state.comment_id != null){
             this.state.comment.text = this.state.new_comment_text;
-            this.state.comment.has_wrong_expression = false;
+
+            if (expression(comment.text) == 1){
+                comment.has_wrong_expression = true;
+            }
+            else{
+                comment.has_wrong_expression = false;
+            }
+
             this.state.comment.approved_at = null;
             this.state.comment.spoiler_flag = this.state.comment_is_spoiler;
             email(this.state.my_email,
