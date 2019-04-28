@@ -87,6 +87,13 @@ export default class AdminConfirmationScreen extends Component {
     const { navigation } = this.props;
     item = navigation.getParam('items', {});
     let expresion = '';
+    if(item.conf.spoiler_flag=="true"){
+      this.setState({check:true});
+    }
+    else{
+      this.setState({check:false});
+    }
+    this.setState({check:});
     if (item.conf.has_wrong_expression=="true") {
       expresion = 'NEPREŠIEL'
       col = 'red';
@@ -96,6 +103,7 @@ export default class AdminConfirmationScreen extends Component {
       col = 'green';
 
     }
+    
     let button;
     if (this.state.loading) {
       button = <ActivityIndicator size="small" color="#0FDDAF" />;
@@ -134,7 +142,7 @@ export default class AdminConfirmationScreen extends Component {
               <Text style={stylos.bold}>Autor:<Text style={stylos.normal}>{item.user.name} {item.user.surname}</Text> </Text>
             </View>
             <View>
-              <Text style={stylos.bold}>Datum pridania: <Text style={stylos.normal}>{moment(new Date(item.conf.created_at)).format("DD/MM/YYY")}</Text></Text>
+              <Text style={stylos.bold}>Datum pridania: <Text style={stylos.normal}>{moment(new Date(item.conf.created_at)).format("DD/MM/YY")}</Text></Text>
             </View>
             <View>
               <Text style={stylos.bold}>Kontrola zakázaných výrazov: <Text style={{ color: col }}>{expresion}</Text></Text>
