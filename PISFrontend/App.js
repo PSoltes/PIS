@@ -7,7 +7,7 @@ import MyBooksScreen from "./screens/MyBooksScreen.js";
 import BookDetail from "./screens/BookDetail.js";
 import AdminConfirmationScreen from "./screens/AdminConfirmationScreen.js";
 import AdminListScreen from "./screens/AdminListScreen.js";
-import AddRevieweScreen from "./screens/AddReviewScreen.js";
+import AddReviewScreen from "./screens/AddReviewScreen.js";
 
 const AppNavigator = createStackNavigator(
   {
@@ -45,8 +45,8 @@ const AppNavigator = createStackNavigator(
         header: null
       }
     },
-    AddRevieweScreen :{
-      screen: AddRevieweScreen ,
+    AddReviewScreen :{
+      screen: AddReviewScreen ,
       navigationOptions:
       {
         header: null
