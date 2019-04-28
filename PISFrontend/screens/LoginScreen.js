@@ -22,7 +22,7 @@ import dearray from "../scripts/Dearray.js";
 import AsyncStorage from "@react-native-community/async-storage";
 const uuidv4 = require("uuid/v4");
 import Modal from "react-native-modal";
-import sendEmail from "../scripts/Email.js"
+import sendEmail from "../scripts/Email.js";
 
 export default class LoginScreen extends React.Component {
   componentWillMount(){
@@ -56,8 +56,21 @@ export default class LoginScreen extends React.Component {
       loggingIn: true
     });
     getByAttribute("email", email, "user")
-      .then(user => {
-          user = dearray(user[0]);
+      .then(
+        user => {
+          if (user) {
+            user = dearray(user[0]);
+          } else {
+            Toast.show({
+              text: "Nesprávne meno alebo heslo!",
+              buttonText: "OK",
+              duration: 3000,
+              type: "danger"
+            });
+            this.setState({ loggingIn: false });
+            return;
+          }
+
           if (user && user.is_blocked == "true") {
             Toast.show({
               text:
@@ -98,30 +111,29 @@ export default class LoginScreen extends React.Component {
                 throw err;
               });
           } else {
-            if (user) {
-              user.login_counter = parseInt(user.login_counter) + 1;
-              if (user.login_counter >= 3) {
-                user.is_blocked = true;
-                user.block_token = uuidv4();
-                console.warn(user.email);
-                sendEmail(
-                  user.email,
-                  "Informačný systém Knižnica - účet zablokovaný",
-                  "Váš účet bolo zablokovaný z dôvodu troch nesprávnych pokusov o prihlásenie. Pre jeho odblokovanie choďte do aplikácie a na úvodnej ploche zvoľte možnosť odblokovať účet a zadajte váš email a nasledujúci token: " +
-                    user.block_token
-                )
-                  .then(response => {
-                    console.warn(response);
-                  })
-                  .catch(err => {
-                    console.warn("email " + err);
-                    throw err;
-                  });
-              }
-              update(user, user.id, "user").then(result => {
-                this.setState({ loggingIn: false });
-              });
+            user.login_counter = parseInt(user.login_counter) + 1;
+            if (user.login_counter >= 3) {
+              user.is_blocked = true;
+              user.block_token = uuidv4();
+              console.warn(user.email);
+              sendEmail(
+                user.email,
+                "Informačný systém Knižnica - účet zablokovaný",
+                "Váš účet bol zablokovaný z dôvodu troch nesprávnych pokusov o prihlásenie. Pre jeho odblokovanie choďte do aplikácie a na úvodnej ploche zvoľte možnosť odblokovať účet a zadajte váš email a nasledujúci token: " +
+                  user.block_token
+              )
+                .then(response => {
+                  console.warn(response);
+                })
+                .catch(err => {
+                  console.warn("email " + err);
+                  throw err;
+                });
             }
+            update(user, user.id, "user").then(result => {
+              this.setState({ loggingIn: false });
+            });
+
             Toast.show({
               text: "Nesprávne meno alebo heslo!",
               buttonText: "OK",

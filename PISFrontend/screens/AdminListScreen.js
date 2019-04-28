@@ -6,6 +6,7 @@ import {FlatList,View,ActivityIndicator} from 'react-native';
 import getByAttribute from "../scripts/GetByAttribute";
 import getById from '../scripts/GetById';
 import Dearray from '../scripts/Dearray';
+import moment from 'moment';
 
 export default class AdminListScreen extends Component {
 
@@ -107,7 +108,7 @@ export default class AdminListScreen extends Component {
                  </View>
                  <Right>
                        <Text>{item.type} </Text>
-                       <Text>{item.conf.created_at}</Text>
+                       <Text>{moment(new Date(item.conf.created_at)).format("DD/MM/YYYY")}</Text>
                  </Right>
                </View>
            </View>
