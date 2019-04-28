@@ -1,5 +1,5 @@
 import React from "react";
-import { createStackNavigator, createAppContainer } from "react-navigation";
+import { createStackNavigator, createAppContainer, createSwitchNavigator } from "react-navigation";
 import { Root } from "native-base";
 import LoginScreen from "./screens/LoginScreen.js";
 import HomeScreen from "./screens/HomeScreen.js";
@@ -7,7 +7,16 @@ import MyBooksScreen from "./screens/MyBooksScreen.js";
 import BookDetail from "./screens/BookDetail.js";
 import AdminConfirmationScreen from "./screens/AdminConfirmationScreen.js";
 import AdminListScreen from "./screens/AdminListScreen.js";
-import AddReviewScreen from "./screens/AddReviewScreen.js";
+import AddRevieweScreen from "./screens/AddReviewScreen.js";
+const switchNav = createSwitchNavigator({
+  
+  AdminConfirmationScreen: AdminConfirmationScreen,
+  AdminListScreen:AdminListScreen },
+  {
+    initialRouteName: "AdminListScreen"
+  
+   
+});
 
 const AppNavigator = createStackNavigator(
   {
@@ -31,15 +40,9 @@ const AppNavigator = createStackNavigator(
         header: null
       }
     },
-    AdminConfirmationScreen:{
-      screen: AdminConfirmationScreen,
-      navigationOptions:
-      {
-        header: null
-      }
-    },
-    AdminListScreen:{
-      screen: AdminListScreen,
+  
+    AdminListScreen: {
+      screen: switchNav,
       navigationOptions:
       {
         header: null

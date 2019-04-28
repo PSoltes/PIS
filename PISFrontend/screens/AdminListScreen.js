@@ -1,40 +1,60 @@
 import React, { Component } from "react";
 import getTheme from "../native-base-theme/components";
 import material from "../native-base-theme/variables/material";
-import { Container, Content, Header, Left, Body, Right, Button, Icon, Title,Text,Card,CardItem,H3,H1} from 'native-base';
-import {FlatList,View} from 'react-native';
+import { Container, Content, Header,StyleProvider, Drawer, Body, Right, Button, Icon, Title,Text,Card,CardItem,H3,H1,H2} from 'native-base';
+import {FlatList,View,ActivityIndicator} from 'react-native';
 import getByAttribute from "../scripts/GetByAttribute";
 import getById from '../scripts/GetById';
-
-
+import Dearray from '../scripts/Dearray';
+import moment from 'moment';
+import SideBar from "../components/SideBar.js"
 export default class AdminListScreen extends Component {
 
+  closeDrawer() {
+    this.drawer._root.close();
+  }
+
+  openDrawer() {
+    this.drawer._root.open();
+  }
   constructor(props) {
     super(props);
     this.state = {
-     confirms: ''
+     confirms: '',
+     loading: false
+
     };
   }
-  async componentWillMount(){
-    let cf= [];
+  async LoadComments(){
+    this.setState({loading:true});
+    let comarr= [];let revarr=[];
     await getByAttribute('approved_at', null, 'comment').then(
     function(conf) {
       console.log(conf);
-      cf=conf;
+      comarr=conf;
     },
     function(err) {
       console.log(err);
     }
     );
-   let arr=[];
-  if(cf){
-    for(let c in cf){
+    await getByAttribute('approved_at', null, 'review').then(
+      function(conf) {
+        console.log(conf);
+        revarr=conf;
+      },
+      function(err) {
+        console.log(err);
+      }
+      );
+      comarr.push(...revarr);
+   let finarr=[];
+  if(comarr){
+    for(let obj in comarr){
       let usr=''; let book='';
-      console.log(cf[c].user_id[0]+" - "+cf[c].book_id[0]);
-      let bkid=cf[c].book_id[0];let usrid=cf[c].user_id[0];
+      let bkid=comarr[obj].book_id[0];let usrid=comarr[obj].user_id[0];
       await getById(usrid,'user').then(
-      function(us) {;
-        usr=us;
+      function(user) {;
+        usr=Dearray(user);
       },
       function(err) {
         console.log(err);
@@ -42,75 +62,111 @@ export default class AdminListScreen extends Component {
       );
       console.log(usr);
       await getById(bkid,'book').then(
-      function(conf) {
-        book=conf;
+      function(respons) {
+        book=Dearray(respons);
       },
       function(err) {
         console.log(err);
       }
       );
-      let obj = {key:cf[c].id[0],book:book,conf:cf[c],type:'Komentár',user:usr};
-      arr.push(obj);
+      let object;
+      if(comarr[obj].name[0]=="review"){
+         object = {key:comarr[obj].id[0],book:book,conf:Dearray(comarr[obj]),type:'Recenzia',user:usr};
+      }
+      else{
+       object = {key:comarr[obj].id[0],book:book,conf:Dearray(comarr[obj]),type:'Komentár',user:usr};
+      }
+      finarr.push(object);
     }
-    this.setState({confirms:arr});
+    this.setState({confirms:finarr});
     console.log(this.state.confirms);
   }
-
+  this.setState({loading:false});
+  }
+  async componentWillMount(){
+    this.LoadComments();
   }
   render() {
-    const { navigation } = this.props;
-    const name = navigation.getParam('name', '');
+    let button;
+    if (this.state.loading) {
+      button =<ActivityIndicator size="large" color="#0FDDAF" />;
+              
+    } else {
+     button= <FlatList
+     data={this.state.confirms}
+     renderItem={({item})=>(
+       <Card style={{width:'90%',alignSelf: 'center'}}>
+         <CardItem width="100%" button onPress={()=>{
+           this.props.navigation.navigate('AdminConfirmationScreen',{items:item});
+          }}>
+           <Body width="100%">
+           <View width="100%">
+               <View>
+                 <H3 style={{color:'#00e6b8'}}>{item.book.name}</H3>
+               </View>
+               <View  width="100%" style={{font:15,flex:1,flexDirection:'row',alignSelf: 'stretch'}}>
+                 <View>
+                 <Text>
+                   {item.book.author}
+                 </Text>
+                   <Text>
+                     {item.user.name} {item.user.surname}
+                   </Text>
+                 </View>
+                 <Right>
+                       <Text>{item.type} </Text>
+                       <Text>{moment(new Date(item.conf.created_at)).format("DD/MM/YYYY")}</Text>
+                 </Right>
+               </View>
+           </View>
+           </Body>
+         </CardItem>
+       </Card>
+     )}
+     />
+    }
     return (
-    <Container>
-      <Header style={{ backgroundColor: '#00e6b8'}} androidStatusBarColor="#00e6b8">
-        <Body>
-        <Title>Potvrdenia</Title>
-        </Body>
-        <Right>
-          <Button transparent>
-            <Icon name="menu" />
-          </Button>
-        </Right>
-      </Header>
-      <Content>
-      <FlatList
-      data={this.state.confirms}
-        /*[{key: '1',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' },
-        {key: '2',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' },
-        {key: '3',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' },
-        {key: '4',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' },
-        {key: '5',book:'Horiaca ríša',author:'Juraj Červenák',date:'12/03/2019',type:'Komentár',user:'Pavol Šoltés' }]}*/
-      renderItem={({item})=>(
-        <Card style={{width:'90%',alignSelf: 'center'}}>
-          <CardItem width="100%" button onPress={()=>{
-            this.props.navigation.navigate('AdminConfirmationScreen',{items:item});
-           }}>
-            <Body width="100%">
-            <View width="100%">
-                <View>
-                  <H3 style={{color:'#00e6b8'}}>{item.book.name[0]}</H3>
-                </View>
-                <View  width="100%" style={{font:15,flex:1,flexDirection:'row',alignSelf: 'stretch'}}>
-                  <View>
-                  <Text>
-                    {item.book.author[0]}
-                  </Text>
-                    <Text>
-                      {item.user.name[0]} {item.user.surname[0]}
-                    </Text>
-                  </View>
-                  <Right>
-                        <Text>{item.type} </Text>
-                        <Text>{item.conf.created_at[0]}</Text>
-                  </Right>
-                </View>
-            </View>
+      <StyleProvider style={getTheme(material)}>
+        <Drawer
+        ref={ref => {
+          this.drawer = ref;
+        }}
+        content={
+          <SideBar
+            navigation={this.props.navigation}
+            closeDrawer={() => this.props.closeDrawer()}
+          />
+        }
+        onClose={() => this.closeDrawer()}
+        >
+        <Container>
+          <Header style={{ backgroundColor: '#00e6b8'}} androidStatusBarColor="#00e6b8">
+            <Body>
+              <Title>Potvrdenia</Title>
             </Body>
-          </CardItem>
-        </Card>
-      )}
-      /></Content>
-    </Container>
+            <Right>
+            <Button transparent
+            onPress={() => {
+              this.LoadComments();
+            }}
+            >
+                <Icon name="sync" />
+              </Button>
+              <Button transparent
+              onPress={() => {
+                this.openDrawer();
+              }}
+              >
+                <Icon name="menu" />
+              </Button>
+            </Right>
+          </Header>
+          <Content contentContainerStyle={{flex:1,flexDirection:'column',justifyContent:'center'}}>
+            {button}
+          </Content>
+        </Container>
+      </Drawer>
+    </StyleProvider>
     );
   }
 }

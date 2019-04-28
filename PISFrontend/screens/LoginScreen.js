@@ -25,6 +25,9 @@ import Modal from "react-native-modal";
 import sendEmail from "../scripts/Email.js";
 
 export default class LoginScreen extends React.Component {
+  componentWillMount(){
+    this.props.navigation.navigate('AdminListScreen');
+  }
   constructor(props) {
     super(props);
     this.state = {
