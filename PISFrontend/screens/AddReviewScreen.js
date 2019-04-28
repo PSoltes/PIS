@@ -13,6 +13,7 @@ import { Grid, Col, Row } from "react-native-easy-grid";
 import insert from '../scripts/Insert.js';
 import update from '../scripts/Update.js';
 import email from '../scripts/Email.js';
+import expression from '../scripts/WrongExpressionWS.js';
 
 export default class AddReviewScreen extends Component {
   closeDrawer() {
@@ -42,7 +43,14 @@ export default class AddReviewScreen extends Component {
 
     review.text = this.state.review_text;
     review.created_at = Date();
-    review.has_wrong_expression = false;
+
+    if (expression(review.text) == 1){
+        review.has_wrong_expresion = true;
+    }
+    else{
+        review.has_wrong_expresion = false;
+    }
+
     review.approved_at = null;
     review.spoiler_flag = false;
 
