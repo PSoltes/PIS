@@ -25,7 +25,7 @@ import {
 import AppHeader from "../components/AppHeader.js";
 import SideBar from "../components/SideBar.js"
 
-import { Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Image, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import { Grid, Col, Row } from "react-native-easy-grid";
 import images from "../img/images.js";
 import auth from "../scripts/Auth.js";
@@ -60,6 +60,7 @@ export default class BookDetail extends Component {
             new_comment_text: '',
             comment_id: '',
             comment: '',
+            comment_is_spoiler: false,
             review: '',
             rating: 0,
             my_rating: 0,
@@ -162,13 +163,13 @@ export default class BookDetail extends Component {
             comment.has_wrong_expression = false;
             comment.approved_at = null;
             comment.text = this.state.new_comment_text;
-            comment.spoiler_flag = false;
+            comment.spoiler_flag = this.state.comment_is_spoiler;
             email(this.state.my_email,
                       "Informačný systém knižnica - komentár pridaný",
                       "Vaš komentár bol úspešne pridaný, prosím počkajte na jeho schválenie pracovníkom knižnice.");
             insert(comment, 'comment').then( res => {
                     this.findComments();
-                    this.setState({ comment_id: '', comment: '', new_comment_text: '' });
+                    this.setState({ comment_id: '', comment: '', new_comment_text: '', comment_is_spoiler: false  });
                     Toast.show({
                         text: "Komentár bol odoslaný na schválenie.",
                         buttonText: "OK",
@@ -183,13 +184,13 @@ export default class BookDetail extends Component {
             this.state.comment.text = this.state.new_comment_text;
             this.state.comment.has_wrong_expression = false;
             this.state.comment.approved_at = null;
-            this.state.comment.spoiler_flag = false;
+            this.state.comment.spoiler_flag = this.state.comment_is_spoiler;
             email(this.state.my_email,
                       "Informačný systém knižnica - komentár zmenený",
                       "Vaš komentár bol úspešne zmenený, prosím počkajte na jeho schválenie pracovníkom knižnice.");
             update(this.state.comment, this.state.comment_id, 'comment').then( res => {
                     this.findComments();
-                    this.setState({ comment_id: '', comment: '', new_comment_text: '' });
+                    this.setState({ comment_id: '', comment: '', new_comment_text: '', comment_is_spoiler: false });
                     Toast.show({
                         text: "Komentár bol odoslaný na schválenie.",
                         buttonText: "OK",
@@ -272,6 +273,19 @@ export default class BookDetail extends Component {
                 />
             )
         }
+        else if (this.state.review.spoiler_flag == 'true' || this.state.review.has_wrong_expression == 'true'){
+                    review_not_approved = (
+                        <Icon style={{ color: "red" }} type="FontAwesome" name="exclamation-triangle"
+                            onPress={() =>{
+                                Toast.show({
+                                    text: "Recenzia obsahuje spojler alebo nevhodný výraz.",
+                                    duration: 3000,
+                                    type: "danger"
+                                });
+                            }}
+                        />
+                    )
+                }
         if (this.state.review.user_id == this.state.my_id){
             if (expanded){
                 button_edit_review = (
@@ -284,7 +298,18 @@ export default class BookDetail extends Component {
                 button_remove_review = (
                     <Icon style={{ color: "white" }} type="FontAwesome" name="trash"
                         onPress={() => {
-                            this.deleteReview(this.state.review.id);
+                            Alert.alert(
+                                'Upozornenie',
+                                'Recenzia bude odstránena',
+                                [
+                                    {
+                                    text: 'Zrušiť',
+                                    style: 'cancel',
+                                    },
+                                    {text: 'OK', onPress: () => this.deleteReview(this.state.review.id)},
+                                ],
+                                {cancelable: false},
+                            );
                         }}
                     />
                 );
@@ -386,7 +411,22 @@ export default class BookDetail extends Component {
                     <Icon style={{ color: "orange" }} type="FontAwesome" name="exclamation-triangle"/>
                 </Button>
             )
-        };
+        }
+        else if (comment.spoiler_flag == 'true' || comment.has_wrong_expression == 'true'){
+                    comment_not_approved = (
+                        <Button transparent
+                            onPress={() =>{
+                                Toast.show({
+                                    text: "Komentár obsahuje spojler alebo nevhodný výraz.",
+                                    duration: 3000,
+                                    type: "danger"
+                                });
+                            }}
+                        >
+                            <Icon style={{ color: "red" }} type="FontAwesome" name="exclamation-triangle"/>
+                        </Button>
+                    )
+                };
 
         if (this.state.my_id == comment.user_id){
             button_edit = (
@@ -402,8 +442,18 @@ export default class BookDetail extends Component {
             button_delete = (
                 <Button transparent
                     onPress={() => {
-                        alert('Komentár bude vymazaný.');
-                        this.deleteComment(comment.id);
+                        Alert.alert(
+                          'Upozornenie',
+                          'Komentár bude odstranený',
+                          [
+                            {
+                              text: 'Zrušiť',
+                              style: 'cancel',
+                            },
+                            {text: 'OK', onPress: () => this.deleteComment(comment.id)},
+                          ],
+                          {cancelable: false},
+                        );
                     }}
                 >
                     <Icon style={{ color: "#0FDDAF" }} type="FontAwesome" name="trash" />
@@ -420,7 +470,7 @@ export default class BookDetail extends Component {
                 </CardItem>
                 <CardItem footer bordered>
                     <Grid>
-                        <Col size={50}>
+                        <Col size={47}>
                             <Row>
                                 <Moment element={Text} format="YYYY-MM-DD HH:mm">{comment.created_at}</Moment>
                             </Row>
@@ -432,10 +482,10 @@ export default class BookDetail extends Component {
                         <Col size={20}>
                             {comment_not_approved}
                         </Col>
-                        <Col style={{alignItems: "flex-end"}} size={15}>
+                        <Col style={{alignItems: "flex-end"}} size={17}>
                             {button_edit}
                         </Col>
-                        <Col style={{alignItems: "flex-end"}} size={15}>
+                        <Col style={{alignItems: "flex-end"}} size={17}>
                             {button_delete}
                         </Col>
                     </Grid>
@@ -450,7 +500,7 @@ export default class BookDetail extends Component {
         reviewElement = (
             <Accordion
                 dataArray={data}
-                expanded
+                expanded={true}
                 renderHeader={this._renderHeader.bind(this)}
                 contentStyle={{ backgroundColor: "#f0f2f5" }}
             />
@@ -566,7 +616,30 @@ export default class BookDetail extends Component {
                         />
                         <Icon style={{ color: "#0FDDAF" }} type="FontAwesome" name="paper-plane"
                               onPress={() => {
-                                this.insertComment();
+                                 Alert.alert(
+                                    'Pridať komentár',
+                                    'Ako chcete komentár pridať?',
+                                    [
+                                        {
+                                            text: 'Zrušiť',
+                                            style: 'cancel',
+                                        },
+                                        {text: 'Odoslať (obsahuje spojler)', onPress: () => {
+                                           this.setState({isLoading:true});
+                                           this.setState({ comment_is_spoiler: true });
+                                           this.insertComment()
+                                           }
+                                        },
+                                        {text: 'Odoslať', onPress: () => {
+                                            this.setState({isLoading:true});
+                                            this.setState({ comment_is_spoiler: false });
+                                            this.insertComment()
+                                            }
+                                        },
+                                    ],
+                                    {cancelable: false},
+                                 );
+                                /*this.insertComment();*/
                               }}
                         />
                     </Item>
