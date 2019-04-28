@@ -5,6 +5,7 @@ import { Container, Content, Header, Left, CheckBox, Body, Right, Button, Icon, 
 import { View, Alert, ActivityIndicator } from 'react-native';
 import Update from '../scripts/Update';
 import Delete from '../scripts/Delete';
+import Email from '../scripts/Email';
 import moment from 'moment';
 let item, col;
 export default class AdminConfirmationScreen extends Component {
@@ -23,6 +24,13 @@ export default class AdminConfirmationScreen extends Component {
     await Update(item.conf, item.conf.id, item.conf.name).then(
       function (respons) {
         retrn = respons;
+      },
+      function (err) {
+        console.log(err);
+      }
+    );
+    await Email(item.user.email,'Schválenie príspevku','Váš prípevok bol schválený.').then(
+      function (respons) {
       },
       function (err) {
         console.log(err);
@@ -48,6 +56,13 @@ export default class AdminConfirmationScreen extends Component {
     await Delete(item.conf.id, item.conf.name).then(
       function (respons) {
         retrn = respons;
+      },
+      function (err) {
+        console.log(err);
+      }
+    );
+    await Email(item.user.email,'Schválenie príspevku','Váš príspevok bol zamietnutý.').then(
+      function (respons) {
       },
       function (err) {
         console.log(err);
@@ -119,7 +134,7 @@ export default class AdminConfirmationScreen extends Component {
               <Text style={stylos.bold}>Autor:<Text style={stylos.normal}>{item.user.name} {item.user.surname}</Text> </Text>
             </View>
             <View>
-              <Text style={stylos.bold}>Datum pridania: <Text style={stylos.normal}>{momet(new Date(item.conf.created_at)).format("DD/MM/YYY")}</Text></Text>
+              <Text style={stylos.bold}>Datum pridania: <Text style={stylos.normal}>{moment(new Date(item.conf.created_at)).format("DD/MM/YYY")}</Text></Text>
             </View>
             <View>
               <Text style={stylos.bold}>Kontrola zakázaných výrazov: <Text style={{ color: col }}>{expresion}</Text></Text>

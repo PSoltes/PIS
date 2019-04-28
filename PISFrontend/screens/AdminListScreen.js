@@ -1,15 +1,22 @@
 import React, { Component } from "react";
 import getTheme from "../native-base-theme/components";
 import material from "../native-base-theme/variables/material";
-import { Container, Content, Header, Left, Body, Right, Button, Icon, Title,Text,Card,CardItem,H3,H1,H2} from 'native-base';
+import { Container, Content, Header,StyleProvider, Drawer, Body, Right, Button, Icon, Title,Text,Card,CardItem,H3,H1,H2} from 'native-base';
 import {FlatList,View,ActivityIndicator} from 'react-native';
 import getByAttribute from "../scripts/GetByAttribute";
 import getById from '../scripts/GetById';
 import Dearray from '../scripts/Dearray';
 import moment from 'moment';
-
+import SideBar from "../components/SideBar.js"
 export default class AdminListScreen extends Component {
 
+  closeDrawer() {
+    this.drawer._root.close();
+  }
+
+  openDrawer() {
+    this.drawer._root.open();
+  }
   constructor(props) {
     super(props);
     this.state = {
@@ -119,28 +126,47 @@ export default class AdminListScreen extends Component {
      />
     }
     return (
-    <Container>
-      <Header style={{ backgroundColor: '#00e6b8'}} androidStatusBarColor="#00e6b8">
-        <Body>
-        <Title>Potvrdenia</Title>
-        </Body>
-        <Right>
-        <Button transparent
-         onPress={() => {
-          this.LoadComments();
+      <StyleProvider style={getTheme(material)}>
+        <Drawer
+        ref={ref => {
+          this.drawer = ref;
         }}
+        content={
+          <SideBar
+            navigation={this.props.navigation}
+            closeDrawer={() => this.props.closeDrawer()}
+          />
+        }
+        onClose={() => this.closeDrawer()}
         >
-            <Icon name="sync" />
-          </Button>
-          <Button transparent>
-            <Icon name="menu" />
-          </Button>
-        </Right>
-      </Header>
-      <Content contentContainerStyle={{flex:1,flexDirection:'column',justifyContent:'center'}}>
-        {button}
-      </Content>
-    </Container>
+        <Container>
+          <Header style={{ backgroundColor: '#00e6b8'}} androidStatusBarColor="#00e6b8">
+            <Body>
+              <Title>Potvrdenia</Title>
+            </Body>
+            <Right>
+            <Button transparent
+            onPress={() => {
+              this.LoadComments();
+            }}
+            >
+                <Icon name="sync" />
+              </Button>
+              <Button transparent
+              onPress={() => {
+                this.openDrawer();
+              }}
+              >
+                <Icon name="menu" />
+              </Button>
+            </Right>
+          </Header>
+          <Content contentContainerStyle={{flex:1,flexDirection:'column',justifyContent:'center'}}>
+            {button}
+          </Content>
+        </Container>
+      </Drawer>
+    </StyleProvider>
     );
   }
 }
