@@ -86,6 +86,7 @@ export default class LoginScreen extends React.Component {
             try {
               AsyncStorage.setItem("id", user.id);
               AsyncStorage.setItem("api_token", user.api_token);
+              AsyncStorage.setItem("email", user.email);
             } catch (error) {
               console.log("posral sa async store " + error);
               throw error;

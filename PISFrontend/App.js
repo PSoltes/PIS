@@ -17,6 +17,7 @@ const switchNav = createSwitchNavigator({
   
    
 });
+
 const AppNavigator = createStackNavigator(
   {
     Login: {
@@ -47,8 +48,8 @@ const AppNavigator = createStackNavigator(
         header: null
       }
     },
-    AddRevieweScreen :{
-      screen: AddRevieweScreen ,
+    AddReviewScreen :{
+      screen: AddReviewScreen ,
       navigationOptions:
       {
         header: null
