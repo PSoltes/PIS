@@ -7,16 +7,17 @@ import MyBooksScreen from "./screens/MyBooksScreen.js";
 import BookDetail from "./screens/BookDetail.js";
 import AdminConfirmationScreen from "./screens/AdminConfirmationScreen.js";
 import AdminListScreen from "./screens/AdminListScreen.js";
-import AddRevieweScreen from "./screens/AddReviewScreen.js";
+import AddReviewScreen from "./screens/AddReviewScreen.js";
+
 const switchNav = createSwitchNavigator({
   
   AdminConfirmationScreen: AdminConfirmationScreen,
-  AdminListScreen:AdminListScreen },
+  AdminListScreen:AdminListScreen 
+},
   {
-    initialRouteName: "AdminListScreen"
-  
-   
-});
+    initialRouteName: "AdminListScreen"  
+}
+);
 
 const AppNavigator = createStackNavigator(
   {

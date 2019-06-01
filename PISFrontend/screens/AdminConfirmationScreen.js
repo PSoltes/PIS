@@ -93,7 +93,6 @@ export default class AdminConfirmationScreen extends Component {
     else{
       this.setState({check:false});
     }
-    this.setState({check:});
     if (item.conf.has_wrong_expression=="true") {
       expresion = 'NEPREŠIEL'
       col = 'red';
